@@ -5,13 +5,17 @@
   import Header from "$lib/components/Header.svelte";
   import "jazz-tools/inspector/register-custom-element";
   import { JazzAccount } from "$lib/schema";
+  import { pwaInfo } from "virtual:pwa-info";
 
   let { children } = $props();
   let appName = "Jazz Svelte starter";
+
+  const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : "");
 </script>
 
 <svelte:head>
   <title>Jazz | Svelte + Tailwind</title>
+  {@html webManifestLink}
 </svelte:head>
 
 <JazzSvelteProvider

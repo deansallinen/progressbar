@@ -17,7 +17,7 @@ export const JazzProfile = co.profile({
 	// Add public fields here
 });
 
-/** The account root is an app-specific per-user private `CoMap`
+/** The account root is an app-specific per-user PRIVATE `CoMap`
  *  where you can store top-level objects for that user */
 export const AccountRoot = co.map({
 	dateOfBirth: z.date(),
