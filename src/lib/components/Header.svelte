@@ -25,7 +25,11 @@
     {/if}
 
     {#if isAuthenticated}
-      <button type="button" onclick={logOut} class="bg-stone-100 py-1.5 px-3 text-sm rounded-md">
+      <button
+        type="button"
+        onclick={logOut}
+        class="bg-stone-100 py-1.5 px-3 text-sm rounded-md"
+      >
         Log out
       </button>
     {:else}
