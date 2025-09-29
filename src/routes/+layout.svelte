@@ -7,7 +7,7 @@
 
   let { children } = $props();
 
-  const appName = "Weightroom";
+  const appName = "ProgressBar";
 
   const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : "");
 </script>

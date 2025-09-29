@@ -12,9 +12,9 @@ export default defineConfig({
 			},
 			includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
 			manifest: {
-				name: "My Awesome App",
-				short_name: "MyApp",
-				description: "My Awesome App description",
+				name: "ProgressBar",
+				short_name: "ProgressBar",
+				description: "A lifting companion",
 				theme_color: "#ffffff",
 				icons: [
 					{

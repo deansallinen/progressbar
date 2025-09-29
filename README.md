@@ -1,4 +1,4 @@
-# Jazz Svelte starter with Tailwind and Passkey Auth
+# ProgressBar
 
 A minimal starter template for building apps with **[Jazz](https://jazz.tools)**, Svelte, TailwindCSS, and Passkey Auth.
 

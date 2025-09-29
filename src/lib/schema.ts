@@ -1,123 +1,146 @@
-import { co, z } from "jazz-tools";
+import { co, z, Group } from "jazz-tools";
+import { radicallySimpleStrength } from "./programs/radicallySimpleStrength";
 
 /**
  * A single set within an exercise.
  * This is the most basic unit of work tracked.
  */
 export const ExerciseSet = co.map({
-	// The weight used for this set (e.g., in lbs or kg)
-	weight: z.number(),
-	// The target number of repetitions for this set
+	weight: z.optional(z.number()),
+	percentage: z.optional(z.number()),
 	targetReps: z.number(),
-	// The actual number of repetitions completed by the user.
-	// This is optional because it's filled in during the workout.
 	completedReps: z.optional(z.number()),
-	// Optional notes for this specific set
 	notes: z.optional(z.string()),
 });
+export type ExerciseSet = co.loaded<typeof ExerciseSet>;
 
 /**
  * An exercise, which consists of a name
  * and a list of sets to be performed.
  */
 export const Exercise = co.map({
-	// The name of the exercise, e.g., "Squat", "Bench Press"
+	slug: z.string(),
 	name: z.string(),
-	// A collaborative list of sets for this exercise.
 	sets: co.list(ExerciseSet),
 });
+export type Exercise = co.loaded<typeof Exercise>;
 
 /**
  * A workout session, which is a collection of exercises.
  */
 export const Workout = co.map({
-	// The name of the workout, e.g., "Leg Day", "Push Day"
+	slug: z.string(),
 	name: z.string(),
-	// Optional notes for the entire workout session
 	notes: z.optional(z.string()),
-	// A collaborative list of exercises for this workout.
 	exercises: co.list(Exercise),
 });
+export type Workout = co.loaded<typeof Workout>;
+
+/**
+ * A rule for progressing in a program.
+ * For now, only linear progression is supported.
+ */
+export const Progression = co.map({
+	type: z.literal("linear"),
+	increment: z.number(),
+	exerciseSlug: z.string(),
+});
+export type Progression = co.loaded<typeof Progression>;
 
 /**
  * A training program, which is a structured collection of workouts.
  */
 export const Program = co.map({
-	// The name of the program, e.g., "Starting Strength", "5/3/1"
 	name: z.string(),
-	// An optional description of the program's goals or structure.
 	description: z.optional(z.string()),
-	// A collaborative list of workouts that make up this program.
 	workouts: co.list(Workout),
+	progression: co.list(Progression),
+	isPublic: z.optional(z.boolean())
 });
+export type Program = co.loaded<typeof Program>;
+export const ProgramTemplate = Program.partial();
+export type ProgramTemplate = co.loaded<typeof ProgramTemplate>;
 
-/** The account profile is an app-specific per-user public `CoMap`
- *  where you can store top-level objects for that user */
+// PUBLIC
 export const UserProfile = co.profile({
 	name: z.string(),
-
-	// Add public fields here
-	//
 });
 
-const WeightUnitSchema = z.literal(["lbs", "kg"]);
-export const WeightUnit = z.infer<typeof WeightUnitSchema>;
+export const WeightUnitSchema = z.literal(["lbs", "kg"]);
+export type WeightUnit = z.infer<typeof WeightUnitSchema>;
 
 export const Settings = co.map({
 	weightUnit: z.optional(WeightUnitSchema),
-	// You can easily add more settings here in the future!
 	// theme: z.optional(z.enum(["light", "dark"])),
 });
 
-/** The account root is an app-specific per-user PRIVATE `CoMap`
- *  where you can store top-level objects for that user */
+export const UserExerciseState = co.map({
+	exerciseSlug: z.string(),
+	currentWorkingWeight: z.number(),
+});
+export type UserExerciseState = co.loaded<typeof UserExerciseState>;
+
+export const UserProgramInstance = co.map({
+	programDefinitionId: z.string(),
+	exerciseStates: co.list(UserExerciseState),
+	lastCompletedWorkoutSlug: z.optional(z.string()),
+	nextWorkoutSlug: z.string(),
+	// Could also track start date, etc.
+});
+export type UserProgramInstance = co.loaded<typeof UserProgramInstance>;
+
+// PRIVATE
 export const AccountRoot = co.map({
 	programs: co.list(Program),
+	activeProgram: co.optional(UserProgramInstance),
 	settings: Settings,
 });
 
 export const JazzAccount = co
-	.account({
-		profile: UserProfile,
-		root: AccountRoot,
-	})
-	.withMigration(async (account, creationProps) => {
-		// This migration runs automatically when a user creates their account.
-		// It ensures that the necessary data structures are initialized.
-		if (!account.$jazz.has("root")) {
-			account.$jazz.set("root", {
-				programs: [], // Initialize with an empty list of programs
-				settings: {
-					weightUnit: "lbs",
-				},
-			});
-		}
-
-		if (!account.$jazz.has("profile")) {
-			// When creating a new profile, we use our custom UserProfile schema
-			const profile = UserProfile.create({
-				name: creationProps?.name ?? "New Lifter",
-			});
-			// Make the profile public so others can see the name/bio
-			profile.$jazz.owner.makePublic();
-			account.$jazz.set("profile", profile);
-		}
-
-		// This new part handles existing accounts that might be missing 'programs'
-		// First, we need to make sure the root object itself is loaded
-		const { root } = await account.$jazz.ensureLoaded({
-			resolve: { root: true },
+.account({
+	profile: UserProfile,
+	root: AccountRoot,
+})
+.withMigration(async (account, creationProps) => {
+	// This migration runs automatically when a user creates their account.
+	// It ensures that the necessary data structures are initialized.
+	if (!account.$jazz.has("root")) {
+		account.$jazz.set("root", {
+			programs: co.list(Program).create([
+				radicallySimpleStrength
+			]), 
+			activeProgram: undefined,
+			settings: {
+				weightUnit: "lbs",
+			},
 		});
+	}
 
-		// Now, we can safely check if the 'programs' field is missing on the loaded root
-		// We check for `undefined` because a field that is simply not loaded yet would be `null`.
-		// `undefined` means the field truly doesn't exist in the data.
-		if (root.programs === undefined) {
-			root.$jazz.set("programs", []);
-		}
-		// If the 'settings' map itself doesn't exist, create it.
-		if (root.settings === undefined) {
-			// We create a new instance of the Settings CoMap and set it on the root.
-			root.$jazz.set("settings", Settings.create({ weightUnit: "lbs" }));
-		}
+	if (!account.$jazz.has("profile")) {
+		// When creating a new profile, we use our custom UserProfile schema
+		const profile = UserProfile.create({
+			name: creationProps?.name ?? "New Lifter",
+		});
+		// Make the profile public so others can see the name/bio
+		profile.$jazz.owner.makePublic();
+		account.$jazz.set("profile", profile);
+	}
+
+	// This new part handles existing accounts that might be missing 'programs'
+	// First, we need to make sure the root object itself is loaded
+	const { root } = await account.$jazz.ensureLoaded({
+		resolve: { root: { programs: true, activeProgram: true, settings: true } },
 	});
+
+	if (root.programs === undefined) {
+		root.$jazz.set("programs", []);
+	}
+	if (root.activeProgram === undefined) {
+		root.$jazz.set("activeProgram", undefined);
+	}
+	if (root.settings === undefined) {
+		root.$jazz.set("settings", Settings.create({ weightUnit: "lbs" }));
+	}
+
+});
+

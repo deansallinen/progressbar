@@ -1,25 +1,11 @@
 <script lang="ts">
-  import { AccountCoState } from "jazz-tools/svelte";
-  import { JazzAccount } from "$lib/schema";
+  import { SettingsStateClass } from "./SettingsState.svelte";
 
-  const account = new AccountCoState(JazzAccount, {
-    resolve: {
-      profile: true,
-      root: { settings: true },
-    },
-  });
-  const me = $derived(account.current);
-
-  function handleUnitChange(event: Event) {
-    const newUnit = (event.currentTarget as HTMLSelectElement).value;
-
-    if (me?.root.settings) {
-      me.root.settings.$jazz.set("weightUnit", newUnit);
-    }
-  }
+  const state = new SettingsStateClass();
+  const me = $derived(state.me);
 </script>
 
-<main>
+<div>
   <h1>Settings for {me?.profile.name}</h1>
 
   {#if !me}
@@ -33,11 +19,7 @@
           id="name"
           type="text"
           value={me?.profile?.name ?? ""}
-          oninput={(e) => {
-            if (!me?.profile) return;
-            const target = e.target as HTMLInputElement;
-            me.profile.$jazz.set("name", target.value);
-          }}
+          oninput={state.handleNameChange}
           placeholder="Set username"
         />
       </section>
@@ -51,7 +33,7 @@
           <select
             id="weight-unit"
             value={me.root.settings.weightUnit}
-            onchange={handleUnitChange}
+            onchange={state.handleUnitChange}
           >
             <option value="lbs">Pounds (lbs)</option>
             <option value="kg">Kilograms (kg)</option>
@@ -60,4 +42,4 @@
       </section>
     </div>
   {/if}
-</main>
+</div>

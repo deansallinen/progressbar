@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { JazzAccount } from "$lib/schema";
   import { usePasskeyAuth } from "jazz-tools/svelte";
   import { AccountCoState } from "jazz-tools/svelte";
@@ -18,12 +19,12 @@
 
 <header class="container">
   <nav>
-    <ul><li><a href="/"><strong>{appName}</strong></a></li></ul>
+    <ul><li><a href={resolve("/")}><strong>{appName}</strong></a></li></ul>
 
     <menu>
       {#if isAuthenticated}
         <li>
-          <a href="/settings">Settings</a>
+          <a href={resolve("/settings")}>Settings</a>
         </li>
         <li>
           <button onclick={logOut}> Log out </button>

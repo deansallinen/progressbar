@@ -1,29 +1,38 @@
 <script lang="ts">
-  import { JazzAccount } from "$lib/schema";
-  import { AccountCoState } from "jazz-tools/svelte";
+	import { AccountCoState } from "jazz-tools/svelte";
+	import { JazzAccount } from "$lib/schema";
+	import { resolve } from "$app/paths";
 
-  const account = new AccountCoState(JazzAccount, {
-    resolve: {
-      profile: true,
-      root: { programs: { $each: true } },
-    },
-  });
+	const account = new AccountCoState(JazzAccount, {
+		resolve: { root: { activeProgram: true } },
+	});
+	const me = $derived(account.current);
 
-  const me = $derived(account.current);
+	const hasActiveProgram = $derived(!!me?.root.activeProgram);
 </script>
 
-<h1>{me?.profile.name}'s Training Programs</h1>
+<h1>Dashboard</h1>
+
 {#if !me}
-  <p>Loading programs...</p>
-{:else if me.root.programs.length === 0}
-  <p>No programs yet. Create one!</p>
+	<p>Loading...</p>
+{:else if hasActiveProgram}
+	<article>
+		<header>
+			<h2>Ready for your next session?</h2>
+		</header>
+		<p>You have an active program. Let's get back to it!</p>
+		<footer>
+			<a href={resolve("/workout")} role="button">Next Workout</a>
+		</footer>
+	</article>
 {:else}
-  <ul>
-    {#each me.root.programs as program}
-      {#if program}
-        <li>{program.name}</li>
-      {/if}
-    {/each}
-  </ul>
-  <a role="button" href="/programs/new">Create Program</a>
+	<article>
+		<header>
+			<h2>Welcome to ProgressBar!</h2>
+		</header>
+		<p>You don't have an active program yet. Let's find one for you.</p>
+		<footer>
+			<a href={resolve("/programs")} role="button">Browse Programs</a>
+		</footer>
+	</article>
 {/if}

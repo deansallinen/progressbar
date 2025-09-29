@@ -1,5 +1,5 @@
 {
-	"name": "svelte-passkey-auth-app",
+	"name": "progressbar",
 	"version": "0.0.151",
 	"type": "module",
 	"private": true,
@@ -9,8 +9,8 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"format": "biome --write .",
-		"lint": "biome --check . && eslint .",
+		"format": "biome format --write .",
+		"lint": "biome check .",
 		"format-and-lint": "bun run format && bun run lint",
 		"format-and-lint:fix": "bun run format --write && bun run lint --fix"
 	},
