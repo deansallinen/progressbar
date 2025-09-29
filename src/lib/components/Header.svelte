@@ -16,39 +16,26 @@
   const isAuthenticated = $derived(state === "signedIn");
 </script>
 
-<header>
-  <nav class="flex justify-between items-center">
-    {#if isAuthenticated}
-      <span>You're logged in.</span>
-    {:else}
-      <span>Authenticate to share the data with another device.</span>
-    {/if}
+<header class="container">
+  <nav>
+    <ul><li><a href="/"><strong>{appName}</strong></a></li></ul>
 
-    {#if isAuthenticated}
-      <button
-        type="button"
-        onclick={logOut}
-        class="bg-stone-100 py-1.5 px-3 text-sm rounded-md"
-      >
-        Log out
-      </button>
-    {:else}
-      <div class="flex gap-2">
-        <button
-          type="button"
-          class="bg-stone-100 py-1.5 px-3 text-sm rounded-md"
-          onclick={() => current.signUp("")}
-        >
-          Sign up
-        </button>
-        <button
-          type="button"
-          class="bg-stone-100 py-1.5 px-3 text-sm rounded-md"
-          onclick={() => current.logIn()}
-        >
-          Log in
-        </button>
-      </div>
-    {/if}
+    <menu>
+      {#if isAuthenticated}
+        <li>
+          <a href="/settings">Settings</a>
+        </li>
+        <li>
+          <button onclick={logOut}> Log out </button>
+        </li>
+      {:else}
+        <li>
+          <button onclick={() => current.signUp("")}> Sign up </button>
+        </li>
+        <li>
+          <button onclick={() => current.logIn()}> Log in </button>
+        </li>
+      {/if}
+    </menu>
   </nav>
 </header>
