@@ -30,9 +30,9 @@
 </script>
 
 {#if plateCalculation.length > 0}
-	<small>
+	<span class="text-nowrap">
 		({plateCalculation
 			.map(({ plate, count }) => `${count}x${plate}`)
 			.join(", ")})
-	</small>
+	</span>
 {/if}

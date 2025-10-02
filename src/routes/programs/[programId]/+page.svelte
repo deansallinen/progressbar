@@ -65,7 +65,7 @@
 		me.root.$jazz.set("activeProgram", newProgramInstance);
 
 		alert(`Program "${program.name}" started!`);
-		goto(`/`);
+		goto(resolve("/"));
 	}
 </script>
 

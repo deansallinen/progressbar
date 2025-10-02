@@ -3,6 +3,8 @@ import {
 	type ExerciseSet,
 	JazzAccount,
 } from "$lib/schema";
+import { goto } from "$app/navigation";
+import { resolve } from "$app/paths";
 
 type CompletedWorkoutState = {
 	[exerciseSlug: string]: { [setIndex: number]: number };
@@ -14,6 +16,10 @@ export class WorkoutStateClass {
 	});
 
 	me = $derived(this.account.current);
+
+	barWeight = $derived(this.me?.root.settings?.barWeight ?? 45);
+
+	weightUnit = $derived(this.me?.root.settings?.weightUnit ?? "lbs");
 
 	// For now, we assume the user only has one active program.
 	activeProgram = $derived(this.me?.root.activeProgram);
@@ -71,6 +77,7 @@ export class WorkoutStateClass {
 			this.completedWorkoutState[exerciseSlug] = {};
 		}
 		this.completedWorkoutState[exerciseSlug][setIndex] = valueAsNumber;
+		console.log(JSON.stringify(this.completedWorkoutState))
 	};
 
 	updateWorkingWeight = (exerciseSlug: string, newWeight: number) => {
@@ -137,5 +144,7 @@ export class WorkoutStateClass {
 			);
 			this.activeProgram.$jazz.set("nextWorkoutSlug", nextWorkout.slug);
 		}
+
+		goto(resolve('/'))
 	};
 }

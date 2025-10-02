@@ -4,6 +4,7 @@
   import Header from "$lib/components/Header.svelte";
   import { JazzAccount } from "$lib/schema";
   import { pwaInfo } from "virtual:pwa-info";
+  import "../app.css";
 
   let { children } = $props();
 

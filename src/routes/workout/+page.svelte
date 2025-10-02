@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { resolve } from "$app/paths";
 	import { WorkoutStateClass } from "./WorkoutState.svelte";
 	import PlateCalculator from "$lib/components/PlateCalculator.svelte";
-	import { resolve } from "$app/paths";
+	import TargetWeight from "$lib/components/TargetWeight.svelte";
+	import CompleteSetButton from "$lib/components/CompleteSetButton.svelte";
 
 	let state = $state<WorkoutStateClass | null>(null);
 
@@ -25,6 +27,8 @@
 		{:else}
 			<h1>{currentWorkout.name}</h1>
 
+			<hr />
+
 			<form
 				onsubmit={(e) => {
 					e.preventDefault();
@@ -35,77 +39,66 @@
 				{#if currentWorkout.exercises}
 					{#each currentWorkout.exercises as exercise}
 						{#if exercise}
-							{@const workingWeight = state.getWorkingWeight(exercise.slug)}
-							<fieldset>
-								<legend>{exercise.name}</legend>
-								<div
-									style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;"
-								>
-									<label for="{exercise.slug}-weight"
-										>Target Working Weight (lbs):</label
-									>
-									<input
-										id="{exercise.slug}-weight"
-										type="number"
-										value={workingWeight}
-										oninput={(e) => {
-											if (!state) return;
-											state.updateWorkingWeight(
-												exercise.slug,
-												e.currentTarget.valueAsNumber,
-											);
-										}}
-										min="0"
-										step="5"
-										style="width: 8rem;"
-									/>
-								</div>
-								<table>
-									<thead>
+							<!-- <pre> -->
+							<!-- 	{JSON.stringify(exercise, null, 2)} -->
+							<!-- </pre> -->
+							<h2>{exercise.name}</h2>
+							<TargetWeight {exercise} {state} />
+
+							<table>
+								<thead>
+									<tr>
+										<th>Set</th>
+										<th>Target</th>
+										<th>Completed Reps</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#if exercise.warmup}
 										<tr>
-											<th>Set</th>
-											<th>Target</th>
-											<th>Completed Reps</th>
+											<td>{0}</td>
+											<td>
+												<strong>
+													{state.barWeight}
+												</strong>
+												{state.weightUnit}
+											</td>
+											<td>10 reps for warmup</td>
 										</tr>
-									</thead>
-									<tbody>
-										{#if exercise.sets}
-											{#each exercise.sets as set, setIndex}
-												{#if set}
-													{@const setWeight = state.calculateSetWeight(
-														set,
-														workingWeight,
-													)}
-													<tr>
-														<td>{setIndex + 1}</td>
-														<td>
-															{setWeight} lbs x
-															{set.targetReps}
-															reps
+									{/if}
+									{#if exercise.sets}
+										{#each exercise.sets as set, setIndex}
+											{#if set}
+												{@const setWeight = state.calculateSetWeight(
+													set,
+													state.getWorkingWeight(exercise.slug),
+												)}
+												<tr>
+													<td>{setIndex + 1}</td>
+													<td>
+														<div class="flex flex-col gap-1">
+															<span>
+																<strong>{setWeight}</strong>
+																{state.weightUnit}
+																<!-- x {set.targetReps} reps -->
+															</span>
 															<PlateCalculator weight={setWeight} />
-														</td>
-														<td>
-															<input
-																type="number"
-																placeholder="Reps"
-																oninput={(e) => {
-																	if (!state) return;
-																	state.updateCompletedReps(
-																		exercise.slug,
-																		setIndex,
-																		e.currentTarget.valueAsNumber,
-																	);
-																}}
-																required
-															/>
-														</td>
-													</tr>
-												{/if}
-											{/each}
-										{/if}
-									</tbody>
-								</table>
-							</fieldset>
+														</div>
+													</td>
+													<td>
+														<CompleteSetButton
+															{state}
+															{set}
+															{exercise}
+															{setIndex}
+														/>
+													</td>
+												</tr>
+											{/if}
+										{/each}
+									{/if}
+								</tbody>
+							</table>
 						{/if}
 					{/each}
 				{/if}

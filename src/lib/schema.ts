@@ -22,6 +22,7 @@ export const Exercise = co.map({
 	slug: z.string(),
 	name: z.string(),
 	sets: co.list(ExerciseSet),
+	warmup: z.optional(z.boolean()),
 });
 export type Exercise = co.loaded<typeof Exercise>;
 
@@ -71,6 +72,7 @@ export type WeightUnit = z.infer<typeof WeightUnitSchema>;
 
 export const Settings = co.map({
 	weightUnit: z.optional(WeightUnitSchema),
+	barWeight: z.optional(z.number()),
 	// theme: z.optional(z.enum(["light", "dark"])),
 });
 
@@ -112,6 +114,7 @@ export const JazzAccount = co
 			activeProgram: undefined,
 			settings: {
 				weightUnit: "lbs",
+				barWeight: 45,
 			},
 		});
 	}

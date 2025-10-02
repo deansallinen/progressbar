@@ -10,6 +10,7 @@ export const radicallySimpleStrength = {
 				{
 					slug: "squat",
 					name: "Squat",
+					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
 						{ percentage: 0.7, targetReps: 5 },
@@ -21,6 +22,7 @@ export const radicallySimpleStrength = {
 				{
 					slug: "bench-press",
 					name: "Bench Press",
+					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
 						{ percentage: 0.7, targetReps: 5 },
@@ -49,6 +51,7 @@ export const radicallySimpleStrength = {
 				{
 					slug: "squat",
 					name: "Squat",
+					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
 						{ percentage: 0.7, targetReps: 5 },
@@ -60,6 +63,7 @@ export const radicallySimpleStrength = {
 				{
 					slug: "overhead-press",
 					name: "Overhead Press",
+					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
 						{ percentage: 0.7, targetReps: 5 },

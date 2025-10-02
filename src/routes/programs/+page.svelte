@@ -22,9 +22,6 @@
 					<a href={resolve(`/programs/${program.$jazz.id}`)} role="button"
 						>View Program</a
 					>
-					<button onclick={() => programsState.startProgram(program)}
-						>Start Program</button
-					>
 				</footer>
 			</article>
 		{/if}
