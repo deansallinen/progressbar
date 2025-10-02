@@ -30,9 +30,11 @@
 </script>
 
 {#if plateCalculation.length > 0}
-	<span class="text-nowrap">
-		({plateCalculation
-			.map(({ plate, count }) => `${count}x${plate}`)
-			.join(", ")})
-	</span>
+	<div class="flex flex-col gap-0 *:mb-0 *:py-0 *:text-gray-400">
+		{#each plateCalculation as { plate, count }}
+			<div class="flex gap-1 text-nowrap tabular-nums">
+				<span>{plate}</span><span> x{count}</span>
+			</div>
+		{/each}
+	</div>
 {/if}

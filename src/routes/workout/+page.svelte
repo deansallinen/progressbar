@@ -76,8 +76,8 @@
 												<tr>
 													<td>{setIndex + 1}</td>
 													<td>
-														<div class="flex flex-col gap-1">
-															<span>
+														<div class="">
+															<span class="text-nowrap">
 																<strong>{setWeight}</strong>
 																{state.weightUnit}
 																<!-- x {set.targetReps} reps -->

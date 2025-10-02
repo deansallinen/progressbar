@@ -73,6 +73,7 @@ export type WeightUnit = z.infer<typeof WeightUnitSchema>;
 export const Settings = co.map({
 	weightUnit: z.optional(WeightUnitSchema),
 	barWeight: z.optional(z.number()),
+	availablePlates: co.list(z.number())
 	// theme: z.optional(z.enum(["light", "dark"])),
 });
 
@@ -115,6 +116,7 @@ export const JazzAccount = co
 			settings: {
 				weightUnit: "lbs",
 				barWeight: 45,
+				availablePlates: [45, 35, 25, 10, 5, 2.5]
 			},
 		});
 	}
@@ -142,7 +144,11 @@ export const JazzAccount = co
 		root.$jazz.set("activeProgram", undefined);
 	}
 	if (root.settings === undefined) {
-		root.$jazz.set("settings", Settings.create({ weightUnit: "lbs" }));
+		root.$jazz.set("settings", Settings.create({
+			weightUnit: "lbs",
+			barWeight: 45, 
+				availablePlates: [45, 35, 25, 10, 5, 2.5]
+		}));
 	}
 
 });
