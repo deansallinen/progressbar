@@ -3,6 +3,11 @@
 	import { JazzAccount } from "$lib/schema";
 	import { resolve } from "$app/paths";
 
+	import { liveQuery } from "dexie";
+	import { db } from "$lib/db";
+
+	let settings = liveQuery(() => db.userSettings.get("userSettings"));
+
 	const account = new AccountCoState(JazzAccount, {
 		resolve: { root: { activeProgram: true } },
 	});
@@ -10,6 +15,10 @@
 
 	const hasActiveProgram = $derived(!!me?.root.activeProgram);
 </script>
+
+{#if $settings}
+	{$settings.weightUnit}
+{/if}
 
 <h1>Dashboard</h1>
 
