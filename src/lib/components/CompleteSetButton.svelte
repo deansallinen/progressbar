@@ -6,7 +6,7 @@
     state: WorkoutStateClass;
     exercise: {
       name: string;
-      slug: string;
+      id: string;
     };
     setIndex: number;
     set: ExerciseSet;
@@ -36,7 +36,7 @@
         oninput={(e) => {
           if (!WorkoutState) return;
           WorkoutState.updateCompletedReps(
-            exercise.slug,
+            exercise.id,
             setIndex,
             e.currentTarget.valueAsNumber,
           );

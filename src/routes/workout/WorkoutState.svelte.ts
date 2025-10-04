@@ -7,7 +7,7 @@ import { goto } from "$app/navigation";
 import { resolve } from "$app/paths";
 
 type CompletedWorkoutState = {
-	[exerciseSlug: string]: { [setIndex: number]: number };
+	[exerciseId: string]: { [setIndex: number]: number };
 };
 
 export class WorkoutStateClass {
@@ -41,17 +41,17 @@ export class WorkoutStateClass {
 	// Determine the current workout from the program definition.
 	currentWorkout = $derived(
 		this.programDefinition?.workouts?.find(
-			(w) => w?.slug === this.activeProgram?.nextWorkoutSlug,
+			(w) => w?.id === this.activeProgram?.nextWorkoutId,
 		),
 	);
 
 	// Create a state object to hold the user's completed reps for this session.
 	completedWorkoutState = $state<CompletedWorkoutState>({});
 
-	getWorkingWeight = (exerciseSlug: string): number => {
+	getWorkingWeight = (exerciseId: string): number => {
 		return (
 			this.activeProgram?.exerciseStates.find(
-				(s) => s?.exerciseSlug === exerciseSlug,
+				(s) => s?.exerciseId === exerciseId,
 			)?.currentWorkingWeight ?? 0
 		);
 	};
@@ -69,22 +69,22 @@ export class WorkoutStateClass {
 	};
 
 	updateCompletedReps = (
-		exerciseSlug: string,
+		exerciseId: string,
 		setIndex: number,
 		valueAsNumber: number,
 	) => {
-		if (!this.completedWorkoutState[exerciseSlug]) {
-			this.completedWorkoutState[exerciseSlug] = {};
+		if (!this.completedWorkoutState[exerciseId]) {
+			this.completedWorkoutState[exerciseId] = {};
 		}
-		this.completedWorkoutState[exerciseSlug][setIndex] = valueAsNumber;
+		this.completedWorkoutState[exerciseId][setIndex] = valueAsNumber;
 		console.log(JSON.stringify(this.completedWorkoutState))
 	};
 
-	updateWorkingWeight = (exerciseSlug: string, newWeight: number) => {
+	updateWorkingWeight = (exerciseId: string, newWeight: number) => {
 		if (!this.activeProgram) return;
 
 		const exerciseState = this.activeProgram.exerciseStates.find(
-			(s) => s?.exerciseSlug === exerciseSlug,
+			(s) => s?.exerciseId === exerciseId,
 		);
 
 		if (exerciseState) {
@@ -101,19 +101,19 @@ export class WorkoutStateClass {
 			for (const exercise of this.currentWorkout.exercises) {
 				if (!exercise) continue;
 				const progressionRule = this.programDefinition.progression?.find(
-					(p) => p?.exerciseSlug === exercise.slug,
+					(p) => p?.exerciseId === exercise.id,
 				);
 				if (!progressionRule || !exercise.sets) continue;
 
 				const lastSetIndex = exercise.sets.length - 1;
 				const lastSet = exercise.sets[lastSetIndex];
 				const completedReps =
-					this.completedWorkoutState[exercise.slug]?.[lastSetIndex];
+					this.completedWorkoutState[exercise.id]?.[lastSetIndex];
 
 				// Simple success condition: did the user meet or beat the target reps on the final set?
 				if (lastSet && completedReps >= lastSet.targetReps) {
 					const exerciseState = this.activeProgram.exerciseStates.find(
-						(s) => s?.exerciseSlug === exercise.slug,
+						(s) => s?.exerciseId === exercise.id,
 					);
 					if (exerciseState) {
 						exerciseState.$jazz.set(
@@ -128,7 +128,7 @@ export class WorkoutStateClass {
 		// --- Determine Next Workout ---
 		const currentWorkoutIndex =
 			this.programDefinition.workouts?.findIndex(
-				(w) => w?.slug === this.currentWorkout?.slug,
+				(w) => w?.id === this.currentWorkout?.id,
 			) ?? -1;
 
 		if (currentWorkoutIndex === -1 || !this.programDefinition.workouts) return;
@@ -139,10 +139,10 @@ export class WorkoutStateClass {
 
 		if (nextWorkout) {
 			this.activeProgram.$jazz.set(
-				"lastCompletedWorkoutSlug",
-				this.currentWorkout.slug,
+				"lastCompletedWorkoutId",
+				this.currentWorkout.id,
 			);
-			this.activeProgram.$jazz.set("nextWorkoutSlug", nextWorkout.slug);
+			this.activeProgram.$jazz.set("nextWorkoutId", nextWorkout.id);
 		}
 
 		goto(resolve('/'))

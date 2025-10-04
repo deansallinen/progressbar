@@ -4,11 +4,11 @@ export const strongLifts = {
 	"StrongLifts 5x5 is a beginner strength program based on five compound exercises: Squat, Bench Press, Deadlift, Overhead Press, and Barbell Row.",
 	workouts: [
 		{
-			slug: "workout-a",
+			id: "workout-a",
 			name: "Workout A",
 			exercises: [
 				{
-					slug: "squat",
+					id: "squat",
 					name: "Squat",
 					sets: [
 						{ weight: 45, targetReps: 5 },
@@ -19,7 +19,7 @@ export const strongLifts = {
 					],
 				},
 				{
-					slug: "bench-press",
+					id: "bench-press",
 					name: "Bench Press",
 					sets: [
 						{ weight: 45, targetReps: 5 },
@@ -30,7 +30,7 @@ export const strongLifts = {
 					],
 				},
 				{
-					slug: "barbell-row",
+					id: "barbell-row",
 					name: "Barbell Row",
 					sets: [
 						{ weight: 65, targetReps: 5 },
@@ -43,11 +43,11 @@ export const strongLifts = {
 			],
 		},
 		{
-			slug: "workout-b",
+			id: "workout-b",
 			name: "Workout B",
 			exercises: [
 				{
-					slug: "squat",
+					id: "squat",
 					name: "Squat",
 					sets: [
 						{ weight: 45, targetReps: 5 },
@@ -58,7 +58,7 @@ export const strongLifts = {
 					],
 				},
 				{
-					slug: "overhead-press",
+					id: "overhead-press",
 					name: "Overhead Press",
 					sets: [
 						{ weight: 45, targetReps: 5 },
@@ -69,7 +69,7 @@ export const strongLifts = {
 					],
 				},
 				{
-					slug: "deadlift",
+					id: "deadlift",
 					name: "Deadlift",
 					sets: [{ weight: 135, targetReps: 5 }],
 				},
@@ -80,27 +80,27 @@ export const strongLifts = {
 		{
 			type: "linear",
 			increment: 5,
-			exerciseSlug: "squat",
+			exerciseId: "squat",
 		},
 		{
 			type: "linear",
 			increment: 5,
-			exerciseSlug: "bench-press",
+			exerciseId: "bench-press",
 		},
 		{
 			type: "linear",
 			increment: 5,
-			exerciseSlug: "barbell-row",
+			exerciseId: "barbell-row",
 		},
 		{
 			type: "linear",
 			increment: 5,
-			exerciseSlug: "overhead-press",
+			exerciseId: "overhead-press",
 		},
 		{
 			type: "linear",
 			increment: 10,
-			exerciseSlug: "deadlift",
+			exerciseId: "deadlift",
 		},
 	],
 };

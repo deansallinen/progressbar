@@ -4,11 +4,11 @@ export const radicallySimpleStrength = {
 	"A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
 	workouts: [
 		{
-			slug: "workout-a",
+			id: "workout-a",
 			name: "Workout A",
 			exercises: [
 				{
-					slug: "squat",
+					id: "squat",
 					name: "Squat",
 					warmup: true,
 					sets: [
@@ -20,7 +20,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					slug: "bench-press",
+					id: "bench-press",
 					name: "Bench Press",
 					warmup: true,
 					sets: [
@@ -32,7 +32,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					slug: "deadlift",
+					id: "deadlift",
 					name: "Deadlift",
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
@@ -45,11 +45,11 @@ export const radicallySimpleStrength = {
 			],
 		},
 		{
-			slug: "workout-b",
+			id: "workout-b",
 			name: "Workout B",
 			exercises: [
 				{
-					slug: "squat",
+					id: "squat",
 					name: "Squat",
 					warmup: true,
 					sets: [
@@ -61,7 +61,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					slug: "overhead-press",
+					id: "overhead-press",
 					name: "Overhead Press",
 					warmup: true,
 					sets: [
@@ -73,7 +73,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					slug: "deadlift",
+					id: "deadlift",
 					name: "Deadlift",
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
@@ -90,22 +90,22 @@ export const radicallySimpleStrength = {
 		{
 			type: "linear",
 			increment: 5,
-			exerciseSlug: "squat",
+			exerciseId: "squat",
 		},
 		{
 			type: "linear",
 			increment: 5,
-			exerciseSlug: "bench-press",
+			exerciseId: "bench-press",
 		},
 		{
 			type: "linear",
 			increment: 5,
-			exerciseSlug: "overhead-press",
+			exerciseId: "overhead-press",
 		},
 		{
 			type: "linear",
 			increment: 10,
-			exerciseSlug: "deadlift",
+			exerciseId: "deadlift",
 		},
 	],
 } as const

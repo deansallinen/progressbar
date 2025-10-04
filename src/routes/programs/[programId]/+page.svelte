@@ -30,21 +30,21 @@
 		}
 
 		// Create initial state for all unique exercises in the program
-		const exerciseSlugs = new Set<string>();
+		const exerciseIds = new Set<string>();
 		if (program.workouts) {
 			for (const workout of program.workouts) {
 				if (!workout?.exercises) continue;
 				for (const exercise of workout.exercises) {
 					if (exercise) {
-						exerciseSlugs.add(exercise.slug);
+						exerciseIds.add(exercise.id);
 					}
 				}
 			}
 		}
 
-		const initialExerciseStates = [...exerciseSlugs].map((slug) => {
+		const initialExerciseStates = [...exerciseIds].map((id) => {
 			return UserExerciseState.create({
-				exerciseSlug: slug,
+				exerciseId: id,
 				// Default starting weight, adjust as needed
 				currentWorkingWeight: 45,
 			});
@@ -59,7 +59,7 @@
 		const newProgramInstance = UserProgramInstance.create({
 			programDefinitionId: programId,
 			exerciseStates: initialExerciseStates,
-			nextWorkoutSlug: firstWorkout.slug,
+			nextWorkoutId: firstWorkout.id,
 		});
 
 		me.root.$jazz.set("activeProgram", newProgramInstance);

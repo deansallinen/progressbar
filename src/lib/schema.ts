@@ -1,62 +1,51 @@
-import { co, z, Group } from "jazz-tools";
+import { co, z, } from "jazz-tools";
 import { radicallySimpleStrength } from "./programs/radicallySimpleStrength";
 
-/**
- * A single set within an exercise.
- * This is the most basic unit of work tracked.
- */
+// a single set
 export const ExerciseSet = co.map({
 	weight: z.optional(z.number()),
 	percentage: z.optional(z.number()),
 	targetReps: z.number(),
 	completedReps: z.optional(z.number()),
+	completedAt: z.optional(z.date()),
 	notes: z.optional(z.string()),
 });
 export type ExerciseSet = co.loaded<typeof ExerciseSet>;
 
-/**
- * An exercise, which consists of a name
- * and a list of sets to be performed.
- */
+// e.g. Squat
 export const Exercise = co.map({
-	slug: z.string(),
+	id: z.string(),
 	name: z.string(),
 	sets: co.list(ExerciseSet),
 	warmup: z.optional(z.boolean()),
 });
 export type Exercise = co.loaded<typeof Exercise>;
 
-/**
- * A workout session, which is a collection of exercises.
- */
+// e.g. workout A - squat, ohp, deadlift
 export const Workout = co.map({
-	slug: z.string(),
+	id: z.string(),
 	name: z.string(),
 	notes: z.optional(z.string()),
 	exercises: co.list(Exercise),
 });
 export type Workout = co.loaded<typeof Workout>;
 
-/**
- * A rule for progressing in a program.
- * For now, only linear progression is supported.
- */
+// e.g. +5lbs each workout
 export const Progression = co.map({
+	exerciseId: z.string(),
 	type: z.literal("linear"),
 	increment: z.number(),
-	exerciseSlug: z.string(),
 });
 export type Progression = co.loaded<typeof Progression>;
 
-/**
- * A training program, which is a structured collection of workouts.
- */
+// e.g. radicallySimpleStrength
 export const Program = co.map({
 	name: z.string(),
 	description: z.optional(z.string()),
 	workouts: co.list(Workout),
 	progression: co.list(Progression),
-	isPublic: z.optional(z.boolean())
+	isPublic: z.optional(z.boolean()),
+	completedWorkouts: co.optional(co.list(Workout))
 });
 export type Program = co.loaded<typeof Program>;
 export const ProgramTemplate = Program.partial();
@@ -78,7 +67,7 @@ export const Settings = co.map({
 });
 
 export const UserExerciseState = co.map({
-	exerciseSlug: z.string(),
+	exerciseId: z.string(),
 	currentWorkingWeight: z.number(),
 });
 export type UserExerciseState = co.loaded<typeof UserExerciseState>;
@@ -86,8 +75,8 @@ export type UserExerciseState = co.loaded<typeof UserExerciseState>;
 export const UserProgramInstance = co.map({
 	programDefinitionId: z.string(),
 	exerciseStates: co.list(UserExerciseState),
-	lastCompletedWorkoutSlug: z.optional(z.string()),
-	nextWorkoutSlug: z.string(),
+	lastCompletedWorkoutId: z.optional(z.string()),
+	nextWorkoutId: z.string(),
 	// Could also track start date, etc.
 });
 export type UserProgramInstance = co.loaded<typeof UserProgramInstance>;
@@ -99,6 +88,18 @@ export const AccountRoot = co.map({
 	settings: Settings,
 });
 
+export const rootDefaults= {
+			programs: co.list(Program).create([
+				radicallySimpleStrength
+			]), 
+			activeProgram: undefined,
+			settings: {
+				weightUnit: "lbs",
+				barWeight: 45,
+				availablePlates: [45, 35, 25, 10, 5, 2.5]
+			}
+} as const
+
 export const JazzAccount = co
 .account({
 	profile: UserProfile,
@@ -108,17 +109,7 @@ export const JazzAccount = co
 	// This migration runs automatically when a user creates their account.
 	// It ensures that the necessary data structures are initialized.
 	if (!account.$jazz.has("root")) {
-		account.$jazz.set("root", {
-			programs: co.list(Program).create([
-				radicallySimpleStrength
-			]), 
-			activeProgram: undefined,
-			settings: {
-				weightUnit: "lbs",
-				barWeight: 45,
-				availablePlates: [45, 35, 25, 10, 5, 2.5]
-			},
-		});
+		account.$jazz.set("root", rootDefaults);
 	}
 
 	if (!account.$jazz.has("profile")) {

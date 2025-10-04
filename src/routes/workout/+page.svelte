@@ -71,7 +71,7 @@
 											{#if set}
 												{@const setWeight = state.calculateSetWeight(
 													set,
-													state.getWorkingWeight(exercise.slug),
+													state.getWorkingWeight(exercise.id),
 												)}
 												<tr>
 													<td>{setIndex + 1}</td>

@@ -4,7 +4,7 @@
   interface Props {
     exercise: {
       name: string;
-      slug: string;
+      id: string;
     };
     state: WorkoutStateClass;
   }
@@ -15,19 +15,19 @@
 </script>
 
 <div class="flex items-center justify-start gap-2">
-  <label for="{exercise.slug}-weight" class="shrink-0"
+  <label for="{exercise.id}-weight" class="shrink-0"
     >Target Working Weight</label
   >
   <input
     class=""
-    id="{exercise.slug}-weight"
+    id="{exercise.id}-weight"
     type="number"
     disabled={!editing}
-    value={WorkoutState.getWorkingWeight(exercise.slug)}
+    value={WorkoutState.getWorkingWeight(exercise.id)}
     oninput={(e) => {
       if (!WorkoutState) return;
       WorkoutState.updateWorkingWeight(
-        exercise.slug,
+        exercise.id,
         e.currentTarget.valueAsNumber,
       );
     }}

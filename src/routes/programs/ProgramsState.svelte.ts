@@ -25,13 +25,13 @@ export class ProgramsState {
 
 		const programId = program.$jazz.id;
         
-		// 1. Determine the first workout slug
+		// 1. Determine the first workout id
 		const firstWorkout = program.workouts![0];
-		if (!firstWorkout || !firstWorkout.slug) {
-			console.error("Program must contain at least one workout with a slug.");
+		if (!firstWorkout || !firstWorkout.id) {
+			console.error("Program must contain at least one workout with a id.");
 			return;
 		}
-		const nextWorkoutSlug = firstWorkout.slug;
+		const nextWorkoutId = firstWorkout.id;
 
 
 		// 2. Initialize Exercise States (assuming initial working weight is 0 for simplicity)
@@ -44,7 +44,7 @@ export class ProgramsState {
                         if (!exercise) return null; 
 
                         return UserExerciseState.create({
-                            exerciseSlug: exercise.slug,
+                            exerciseId: exercise.id,
                             currentWorkingWeight: 45, // Using 45 as the example starting weight
                         });
                     })
@@ -62,8 +62,8 @@ export class ProgramsState {
         const newProgramInstance = UserProgramInstance.create({
             programDefinitionId: programId,
 			exerciseStates: initialExerciseStates as UserExerciseState[],
-            lastCompletedWorkoutSlug: undefined,
-            nextWorkoutSlug: nextWorkoutSlug,
+            lastCompletedWorkoutId: undefined,
+            nextWorkoutId: nextWorkoutId,
         });
 
         // 4. Set the new instance as the active program
@@ -73,7 +73,7 @@ export class ProgramsState {
 
         // OPTIONAL: Navigate the user to the workout page
         // if (typeof window !== 'undefined') {
-        //     window.location.href = `/workout/${nextWorkoutSlug}`;
+        //     window.location.href = `/workout/${nextWorkoutId}`;
         // }
 	}
 }

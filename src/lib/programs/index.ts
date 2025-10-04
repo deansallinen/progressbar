@@ -4,13 +4,13 @@ export function getPrograms(account: any) {
 		return {};
 	}
 
-	// Create a map of programs by slug for easy lookup
+	// Create a map of programs by id for easy lookup
 	const programsMap: Record<string, any> = {};
 	for (const program of account.current.root.programs) {
 		if (program) {
-			// Use the program name to create a slug
-			const slug = program.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-			programsMap[slug] = program;
+			// Use the program name to create a id
+			const id = program.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+			programsMap[id] = program;
 		}
 	}
 
