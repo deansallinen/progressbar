@@ -26,9 +26,6 @@
         <li>
           <a href={resolve("/settings")}>Settings</a>
         </li>
-        <li>
-          <button onclick={logOut}> Log out </button>
-        </li>
       {:else}
         <li>
           <button onclick={() => current.signUp("")}> Sign up </button>

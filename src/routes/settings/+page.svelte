@@ -1,13 +1,27 @@
 <script lang="ts">
   import { SettingsStateClass } from "./SettingsState.svelte";
+  import { JazzAccount } from "$lib/schema";
+  import { AccountCoState } from "jazz-tools/svelte";
+  import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
+
+  const { logOut } = new AccountCoState(JazzAccount);
 
   const state = new SettingsStateClass();
   const me = $derived(state.me);
+
+  const handleLogOut = () => {
+    logOut();
+    goto(resolve("/"));
+  };
 </script>
 
 <div>
-  <h1>Settings for {me?.profile.name}</h1>
+  <div class="flex justify-between items-center">
+    <h1>Settings for {me?.profile.name}</h1>
 
+    <button onclick={handleLogOut}> Log out </button>
+  </div>
   {#if !me}
     <p>Loading your settings...</p>
   {:else}
