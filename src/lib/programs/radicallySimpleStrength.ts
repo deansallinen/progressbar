@@ -1,15 +1,19 @@
-export const radicallySimpleStrength = {
+const rssDefinitions = {
+	squat: { name: "Squat", incrementWeight: 5 },
+	bench: { name: "Bench Press", incrementWeight: 5 },
+	deadlift: { name: "Deadlift", incrementWeight: 10 },
+	ohp: { name: "Overhead Press", incrementWeight: 5 },
+};
+
+export const rssProgramTemplate = {
 	name: "Radically Simple Strength",
-	description:
-	"A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
+	description: "A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
 	workouts: [
 		{
-			id: "workout-a",
 			name: "Workout A",
 			exercises: [
 				{
-					id: "squat",
-					name: "Squat",
+					definition: rssDefinitions.squat, // Reference to the definition
 					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
@@ -20,8 +24,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					id: "bench-press",
-					name: "Bench Press",
+					definition: rssDefinitions.bench, // Reference
 					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
@@ -32,8 +35,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					id: "deadlift",
-					name: "Deadlift",
+					definition: rssDefinitions.deadlift, // Reference
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
 						{ percentage: 0.7, targetReps: 3 },
@@ -45,12 +47,10 @@ export const radicallySimpleStrength = {
 			],
 		},
 		{
-			id: "workout-b",
 			name: "Workout B",
 			exercises: [
 				{
-					id: "squat",
-					name: "Squat",
+					definition: rssDefinitions.squat, // Reference (re-using the same definition)
 					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
@@ -61,8 +61,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					id: "overhead-press",
-					name: "Overhead Press",
+					definition: rssDefinitions.ohp, // Reference
 					warmup: true,
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
@@ -73,8 +72,7 @@ export const radicallySimpleStrength = {
 					],
 				},
 				{
-					id: "deadlift",
-					name: "Deadlift",
+					definition: rssDefinitions.deadlift, // Reference (re-using the same definition)
 					sets: [
 						{ percentage: 0.6, targetReps: 5 },
 						{ percentage: 0.7, targetReps: 3 },
@@ -86,26 +84,4 @@ export const radicallySimpleStrength = {
 			],
 		},
 	],
-	progression: [
-		{
-			type: "linear",
-			increment: 5,
-			exerciseId: "squat",
-		},
-		{
-			type: "linear",
-			increment: 5,
-			exerciseId: "bench-press",
-		},
-		{
-			type: "linear",
-			increment: 5,
-			exerciseId: "overhead-press",
-		},
-		{
-			type: "linear",
-			increment: 10,
-			exerciseId: "deadlift",
-		},
-	],
-} as const
+} as const;

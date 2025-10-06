@@ -1,26 +1,15 @@
 <script lang="ts">
-  import { SettingsStateClass } from "./SettingsState.svelte";
-  import { JazzAccount } from "$lib/schema";
-  import { AccountCoState } from "jazz-tools/svelte";
-  import { goto } from "$app/navigation";
-  import { resolve } from "$app/paths";
+  import { SettingsState } from "./SettingsState.svelte";
 
-  const { logOut } = new AccountCoState(JazzAccount);
-
-  const state = new SettingsStateClass();
-  const me = $derived(state.me);
-
-  const handleLogOut = () => {
-    logOut();
-    goto(resolve("/"));
-  };
+  const settings = new SettingsState();
+  const me = $derived(settings.me);
 </script>
 
 <div>
   <div class="flex justify-between items-center">
     <h1>Settings for {me?.profile.name}</h1>
 
-    <button onclick={handleLogOut}> Log out </button>
+    <button onclick={settings.handleLogOut}> Log out </button>
   </div>
   {#if !me}
     <p>Loading your settings...</p>
@@ -33,7 +22,7 @@
           id="name"
           type="text"
           value={me?.profile?.name ?? ""}
-          oninput={state.handleNameChange}
+          oninput={settings.handleNameChange}
           placeholder="Set username"
         />
       </section>
@@ -47,13 +36,38 @@
           <select
             id="weight-unit"
             value={me.root.settings.weightUnit}
-            onchange={state.handleUnitChange}
+            onchange={settings.handleUnitChange}
           >
             <option value="lbs">Pounds (lbs)</option>
             <option value="kg">Kilograms (kg)</option>
           </select>
         </div>
       </section>
+
+      {#if me?.root.activeProgram}
+        {@const program = me.root.activeProgram}
+        <section>
+          <h2>Targets</h2>
+          <ul>
+            {#each program.exerciseStates || [] as state}
+              <li>
+                <label for={state?.exerciseId}>{state?.exerciseId}</label>
+                <input
+                  id={state?.exerciseId}
+                  type="text"
+                  value={state?.currentWorkingWeight}
+                  oninput={settings.handleTargetChange}
+                  placeholder="Set username"
+                />
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
     </div>
+  {/if}
+
+  {#if me?.root.activeProgram}
+    <button onclick={settings.stopActiveProgram}>Stop Active Program</button>
   {/if}
 </div>

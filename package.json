@@ -12,7 +12,8 @@
 		"format": "biome format --write .",
 		"lint": "biome check .",
 		"format-and-lint": "bun run format && bun run lint",
-		"format-and-lint:fix": "bun run format --write && bun run lint --fix"
+		"format-and-lint:fix": "bun run format --write && bun run lint --fix",
+		"deploy:worker": "bun run src/worker/bootstrapCatalog.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.4",
@@ -20,6 +21,7 @@
 		"@sveltejs/kit": "^2.36.1",
 		"@sveltejs/vite-plugin-svelte": "^5.1.1",
 		"@tailwindcss/postcss": "^4.1.11",
+		"@types/bun": "^1.2.23",
 		"@vite-pwa/sveltekit": "^1.0.0",
 		"globals": "^15.11.0",
 		"is-ci": "^3.0.1",

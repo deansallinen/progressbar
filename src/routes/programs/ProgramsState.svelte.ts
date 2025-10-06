@@ -1,4 +1,4 @@
-import { Exercise, JazzAccount, Program, UserExerciseState, UserProgramInstance, Workout } from "$lib/schema";
+import { WorkoutExercise, JazzAccount, Program, UserExerciseState, UserProgramInstance, Workout } from "$lib/schema";
 import type { CoValue } from "jazz-tools";
 import { AccountCoState } from "jazz-tools/svelte";
 
