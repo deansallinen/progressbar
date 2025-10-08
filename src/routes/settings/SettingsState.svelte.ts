@@ -1,28 +1,31 @@
-
-  import { liveQuery } from "dexie";
-  import { db, type WeightUnit } from "$lib/db";
+import { getContext, setContext } from "svelte";
+import { AppSettings, db, defaultAppSettings, type WeightUnit } from "../../db";
+import { liveQuery } from "dexie";
 
 export class SettingsState {
+  settings = liveQuery(async () => {
+    const appSettings = await db.appSettings.get(1)
+    return appSettings ?? defaultAppSettings as AppSettings
+  }
+  );
 
-  settings = liveQuery(() => db.userSettings.get("userSettings"));
+  handleNameChange = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    db.appSettings.update(1, { userName: target.value });
+  }
 
-	// weightUnit = $derived(this.settings.weightUnit)
+  handleUnitChange = (e: Event) => {
+    const newUnit = (e.currentTarget as HTMLSelectElement).value as WeightUnit;
+    db.appSettings.update(1, { weightUnit: newUnit });
+  }
+}
 
-		updateWeightUnit = (unit: WeightUnit) => db.userSettings.update('userSettings', {weightUnit: unit })
-	
+const DEFAULT_KEY = '$_settings_state'
 
-	// handleUnitChange = (event: Event) => {
-	// 	const newUnit = (event.currentTarget as HTMLSelectElement)
-	// 		.value as WeightUnit;
-	//
-	// 	if (this.me?.root.settings) {
-	// 		this.me.root.settings.$jazz.set("weightUnit", newUnit);
-	// 	}
-	// };
-	//
-	// handleNameChange = (event: Event) => {
-	// 	if (!this.me?.profile) return;
-	// 	const target = event.target as HTMLInputElement;
-	// 	this.me.profile.$jazz.set("name", target.value);
-	// };
+export const getSettingsState = ( key = DEFAULT_KEY) => {
+  return getContext<SettingsState>(key)
+}
+export const setSettingsState = ( key = DEFAULT_KEY) => {
+  const settingsState = new SettingsState()
+  return setContext(key, settingsState)
 }

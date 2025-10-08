@@ -1,15 +1,11 @@
 <script lang="ts">
-  import type { WorkoutStateClass } from "../../routes/workout/WorkoutState.svelte";
+  import type { ExerciseDefinition } from "../../db";
 
   interface Props {
-    exercise: {
-      name: string;
-      id: string;
-    };
-    state: WorkoutStateClass;
+    exercise: ExerciseDefinition;
   }
 
-  const { exercise, state: WorkoutState }: Props = $props();
+  const { exercise }: Props = $props();
 
   let editing = $state(false);
 </script>
@@ -23,13 +19,10 @@
     id="{exercise.id}-weight"
     type="number"
     disabled={!editing}
-    value={WorkoutState.getWorkingWeight(exercise.id)}
+    value={exercise.workingWeight}
     oninput={(e) => {
-      if (!WorkoutState) return;
-      WorkoutState.updateWorkingWeight(
-        exercise.id,
-        e.currentTarget.valueAsNumber,
-      );
+      e.preventDefault();
+      exercise.setWorkingWeight(e.currentTarget.valueAsNumber);
     }}
     min="0"
     step="5"

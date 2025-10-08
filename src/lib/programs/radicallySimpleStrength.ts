@@ -1,87 +1,203 @@
-const rssDefinitions = {
-	squat: { name: "Squat", incrementWeight: 5 },
-	bench: { name: "Bench Press", incrementWeight: 5 },
-	deadlift: { name: "Deadlift", incrementWeight: 10 },
-	ohp: { name: "Overhead Press", incrementWeight: 5 },
-};
-
-export const rssProgramTemplate = {
+export const createProgram = (squatId: number, benchId: number, ohpId: number, deadliftId: number) =>  ( {
 	name: "Radically Simple Strength",
-	description: "A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
+	description:
+	"A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
 	workouts: [
 		{
 			name: "Workout A",
 			exercises: [
 				{
-					definition: rssDefinitions.squat, // Reference to the definition
-					warmup: true,
+					// Squat
+					exerciseDefinitionId: squatId,
 					sets: [
-						{ percentage: 0.6, targetReps: 5 },
-						{ percentage: 0.7, targetReps: 5 },
-						{ percentage: 0.8, targetReps: 5 },
-						{ percentage: 0.9, targetReps: 5 },
-						{ percentage: 1.0, targetReps: 5 },
+						{
+							type: "percentage",
+							value: 0.6,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.7,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.8,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.9,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{ type: "work", targetReps: 5 }, // The 100% working set
 					],
 				},
 				{
-					definition: rssDefinitions.bench, // Reference
-					warmup: true,
+					// Bench Press
+					exerciseDefinitionId: benchId,
 					sets: [
-						{ percentage: 0.6, targetReps: 5 },
-						{ percentage: 0.7, targetReps: 5 },
-						{ percentage: 0.8, targetReps: 5 },
-						{ percentage: 0.9, targetReps: 5 },
-						{ percentage: 1.0, targetReps: 5 },
+						{
+							type: "percentage",
+							value: 0.6,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.7,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.8,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.9,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{ type: "work", targetReps: 5 }, // The 100% working set
 					],
 				},
 				{
-					definition: rssDefinitions.deadlift, // Reference
+					// Deadlift
+					exerciseDefinitionId: deadliftId,
 					sets: [
-						{ percentage: 0.6, targetReps: 5 },
-						{ percentage: 0.7, targetReps: 3 },
-						{ percentage: 0.8, targetReps: 2 },
-						{ percentage: 0.9, targetReps: 1 },
-						{ percentage: 1.0, targetReps: 5 },
+						{
+							type: "percentage",
+							value: 0.6,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.7,
+							targetReps: 3,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.8,
+							targetReps: 2,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.9,
+							targetReps: 1,
+							notes: "Warm-up",
+						},
+						{ type: "work", targetReps: 5 }, // The 100% working set
 					],
 				},
 			],
 		},
 		{
+			// --- WORKOUT B ---
 			name: "Workout B",
 			exercises: [
 				{
-					definition: rssDefinitions.squat, // Reference (re-using the same definition)
-					warmup: true,
+					// Squat (re-used)
+					exerciseDefinitionId: squatId,
 					sets: [
-						{ percentage: 0.6, targetReps: 5 },
-						{ percentage: 0.7, targetReps: 5 },
-						{ percentage: 0.8, targetReps: 5 },
-						{ percentage: 0.9, targetReps: 5 },
-						{ percentage: 1.0, targetReps: 5 },
+						{
+							type: "percentage",
+							value: 0.6,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.7,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.8,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.9,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{ type: "work", targetReps: 5 },
 					],
 				},
 				{
-					definition: rssDefinitions.ohp, // Reference
-					warmup: true,
+					// Overhead Press
+					exerciseDefinitionId: ohpId,
 					sets: [
-						{ percentage: 0.6, targetReps: 5 },
-						{ percentage: 0.7, targetReps: 5 },
-						{ percentage: 0.8, targetReps: 5 },
-						{ percentage: 0.9, targetReps: 5 },
-						{ percentage: 1.0, targetReps: 5 },
+						{
+							type: "percentage",
+							value: 0.6,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.7,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.8,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.9,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{ type: "work", targetReps: 5 },
 					],
 				},
 				{
-					definition: rssDefinitions.deadlift, // Reference (re-using the same definition)
+					// Deadlift (re-used)
+					exerciseDefinitionId: deadliftId,
 					sets: [
-						{ percentage: 0.6, targetReps: 5 },
-						{ percentage: 0.7, targetReps: 3 },
-						{ percentage: 0.8, targetReps: 2 },
-						{ percentage: 0.9, targetReps: 1 },
-						{ percentage: 1.0, targetReps: 5 },
+						{
+							type: "percentage",
+							value: 0.6,
+							targetReps: 5,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.7,
+							targetReps: 3,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.8,
+							targetReps: 2,
+							notes: "Warm-up",
+						},
+						{
+							type: "percentage",
+							value: 0.9,
+							targetReps: 1,
+							notes: "Warm-up",
+						},
+						{ type: "work", targetReps: 5 },
 					],
 				},
 			],
 		},
-	],
-} as const;
+	]} )

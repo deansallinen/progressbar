@@ -1,30 +1,14 @@
 <script lang="ts">
-	import { AccountCoState } from "jazz-tools/svelte";
-	import { JazzAccount } from "$lib/schema";
 	import { resolve } from "$app/paths";
+	import { getSettingsState } from "./settings/SettingsState.svelte";
 
-	import { liveQuery } from "dexie";
-	import { db } from "$lib/db";
-
-	let settings = liveQuery(() => db.userSettings.get("userSettings"));
-
-	const account = new AccountCoState(JazzAccount, {
-		resolve: { root: { activeProgram: true } },
-	});
-	const me = $derived(account.current);
-
-	const hasActiveProgram = $derived(!!me?.root.activeProgram);
+	const { settings } = getSettingsState();
+	const hasActiveProgram = $derived($settings?.activeProgramId);
 </script>
-
-{#if $settings}
-	{$settings.weightUnit}
-{/if}
 
 <h1>Dashboard</h1>
 
-{#if !me}
-	<p>Loading...</p>
-{:else if hasActiveProgram}
+{#if hasActiveProgram}
 	<article>
 		<header>
 			<h2>Ready for your next session?</h2>
@@ -39,7 +23,6 @@
 		<header>
 			<h2>Welcome to ProgressBar!</h2>
 		</header>
-		<p>You don't have an active program yet. Let's find one for you.</p>
 		<footer>
 			<a href={resolve("/programs")} role="button">Browse Programs</a>
 		</footer>
