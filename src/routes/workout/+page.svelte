@@ -1,96 +1,77 @@
 <script lang="ts">
-	import { resolve } from "$app/paths";
-	import { WorkoutStateClass } from "./WorkoutState.svelte";
 	import PlateCalculator from "$lib/components/PlateCalculator.svelte";
 	import TargetWeight from "$lib/components/TargetWeight.svelte";
 	import CompleteSetButton from "$lib/components/CompleteSetButton.svelte";
+	import RestTimer from "$lib/components/RestTimer.svelte";
+	import { settings } from "$lib/state/settings.svelte";
+	import {
+		activeWorkoutStore,
+		completeSet,
+		completeWorkout,
+		createActiveWorkout,
+	} from "$lib/state/workout.svelte";
 	import { onMount } from "svelte";
-	import { db } from "../../db";
-	import { liveQuery } from "dexie";
-	import { getSettingsState } from "../settings/SettingsState.svelte";
 
-	const { settings } = getSettingsState();
-
-	let program;
+	const workout = $derived($activeWorkoutStore);
 
 	onMount(() => {
-		program = liveQuery(() => db.programs.get($settings.activeProgramId));
+		if (!workout) createActiveWorkout();
 	});
 </script>
 
-<main>
-	{#if activeWorkout}
-		<h1>{activeWorkout.workoutName}</h1>
+<main class="container">
+	{#if workout}
+		<h1>{workout.name}</h1>
 		<hr />
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				// if (!workoutState) return;
-				console.log("workout completed");
-				// workoutState.completeWorkout();
-			}}
-		>
-			{#if activeWorkout.exercises}
-				{#each activeWorkout.exercises as exercise}
-					{#if exercise}
-						<!-- <pre> -->
-						<!-- 		{JSON.stringify(exercise, null, 2)} -->
-						<!-- 	</pre> -->
-						<h2>{exercise.definition.name}</h2>
-						<TargetWeight exercise={exercise.definition} />
-						<table>
-							<thead>
-								<tr>
-									<th>Set</th>
-									<th>Target</th>
-									<th>Completed Reps</th>
-								</tr>
-							</thead>
-							<tbody>
-								<!-- {#if exercise.definition.warmup} -->
-								<!-- 	<tr> -->
-								<!-- 		<td>{0}</td> -->
-								<!-- 		<td> -->
-								<!-- 			<strong> -->
-								<!-- 				{state.barWeight} -->
-								<!-- 			</strong> -->
-								<!-- 			{state.weightUnit} -->
-								<!-- 		</td> -->
-								<!-- 		<td>10 reps for warmup</td> -->
-								<!-- 	</tr> -->
-								<!-- {/if} -->
-								{#if exercise.sets}
-									{#each exercise.sets as set, setIndex}
-										{#if set}
-											<tr>
-												<td>{setIndex + 1}</td>
-												<td>
-													<div class="">
-														<span class="text-nowrap">
-															<strong>{set.targetWeight}</strong>
-															{activeWorkout.weightUnit}
-														</span>
-														<PlateCalculator weight={set.targetWeight} />
-													</div>
-												</td>
-												<td>
-													<!-- <CompleteSetButton -->
-													<!-- 	{state} -->
-													<!-- 	{set} -->
-													<!-- 	{exercise} -->
-													<!-- 	{setIndex} -->
-													<!-- /> -->
-												</td>
-											</tr>
-										{/if}
-									{/each}
+		{#each workout.exercises as exercise, exerciseIndex}
+			{#if exercise}
+				<div class="flex gap-2 items-center">
+					<h2>{exercise.name}</h2>
+					<TargetWeight {exercise} />
+				</div>
+				<table>
+					<thead>
+						<tr>
+							<th>Set</th>
+							<th>Target</th>
+							<th>Completed Reps</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#if exercise.sets}
+							{#each exercise.sets as set, setIndex}
+								{#if set}
+									<tr>
+										<td>{setIndex + 1}</td>
+										<td>
+											<div class="">
+												<span class="text-nowrap">
+													<strong>{set.targetWeight}</strong>
+													{#if $settings}
+														{$settings.weightUnit}
+													{/if}
+												</span>
+												<PlateCalculator weight={set.targetWeight} />
+											</div>
+										</td>
+										<td>
+											<CompleteSetButton
+												{set}
+												onCompleteSet={(reps) =>
+													completeSet(exerciseIndex, setIndex, reps)}
+											/>
+										</td>
+									</tr>
+									{#if set.completedAt && setIndex < exercise.sets.length - 1 && !exercise.sets[setIndex + 1].completedAt}
+										<RestTimer lastCompletedAt={set.completedAt} />
+									{/if}
 								{/if}
-							</tbody>
-						</table>
-					{/if}
-				{/each}
+							{/each}
+						{/if}
+					</tbody>
+				</table>
 			{/if}
-			<button type="submit">Complete Workout</button>
-		</form>
+		{/each}
+		<button onclick={completeWorkout}>Complete Workout</button>
 	{/if}
 </main>

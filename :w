@@ -28,7 +28,7 @@
 </script>
 
 {#if editing}
-  <div class="flex items-center justify-end gap-2 flex-1">
+  <div class="flex items-center justify-start gap-2">
     <input
       class=""
       id="{exercise.exerciseId}-weight"
@@ -63,8 +63,8 @@
   </div>
 {:else}
   <div class="flex grow justify-between items-center">
-    <span class="text-md mb-2 text-gray-400">
-      @ {workingWeight}
+    <span class="text-lg mb-2">
+      @{workingWeight}
     </span>
     <button
       onclick={() => (editing = !editing)}

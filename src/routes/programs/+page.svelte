@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { ProgramsState } from "./ProgramsState.svelte";
+	import { db } from "$lib/db";
+	import { programs, startProgram } from "$lib/state/program.svelte";
 
-	const programsState = new ProgramsState();
-
-	const programs = $derived(programsState.programs);
+	const getExerciseName = async (exerciseId: number) => {
+		const exercise = await db.exercises.get(exerciseId);
+		return exercise!.name;
+	};
 </script>
 
-<main>
+<main class="container">
 	<h1>Browse Programs</h1>
 	<p>Select a program to view its details and get started.</p>
 
@@ -19,10 +21,23 @@
 						<p>{program.workouts.length} workouts</p>
 					</hgroup>
 				</header>
+
 				<p>{program.description}</p>
+
+				<div class="grid">
+					{#each program.workouts as workout}
+						<div>
+							<h3>{workout.name}</h3>
+							<ul>
+								{#each workout.exercises as exercise}
+									<li>{await getExerciseName(exercise.exerciseId)}</li>
+								{/each}
+							</ul>
+						</div>
+					{/each}
+				</div>
 				<footer>
-					<!-- <a href={resolve(`/programs/${program.$jazz.id}`)} role="button" >View Program</a> -->
-					<button onclick={() => programsState.startProgram(program)}>
+					<button onclick={() => startProgram(program.id)}>
 						Start This Program
 					</button>
 				</footer>

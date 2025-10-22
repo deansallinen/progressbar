@@ -4,20 +4,42 @@ This file provides guidelines for agentic coding agents operating in this reposi
 
 ## Commands
 
-- **Build:** `bun run build`
-- **Lint:** `bun run lint`
-- **Format:** `bun run format`
-- **Type Check:** `bun run check`
+- **Build:** `bun run build` (Runs type check and Vite build)
+- **Lint:** `bun run lint` (Uses Biome for linting)
+- **Format:** `bun run format` (Uses Biome for formatting)
+- **Type Check:** `bun run check` (Uses Svelte-Check)
+- **Tests:** There are no unit tests in this project.
 
-There are no tests in this project.
+You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
+
+## Available MCP Tools:
+
+### 1. list-sections
+
+Use this FIRST to discover all available documentation sections. Returns a structured list with titles, use_cases, and paths.
+When asked about Svelte or SvelteKit topics, ALWAYS use this tool at the start of the chat to find relevant sections.
+
+### 2. get-documentation
+
+Retrieves full documentation content for specific sections. Accepts single or multiple sections.
+After calling the list-sections tool, you MUST analyze the returned documentation sections (especially the use_cases field) and then use the get-documentation tool to fetch ALL documentation sections that are relevant for the user's task.
+
+### 3. svelte-autofixer
+
+Analyzes Svelte code and returns issues and suggestions.
+You MUST use this tool whenever writing Svelte code before sending it to the user. Keep calling it until no issues or suggestions are returned.
+
+### 4. playground-link
+
+Generates a Svelte Playground link with the provided code.
+After completing the code, ask the user if they want a playground link. Only call this tool after user confirmation and NEVER if code was written to files in their project.
 
 ## Code Style
 
-- **TypeScript:** Use TypeScript with strict type safety. All code examples must be production-ready and type-safe.
-- **Framework:** This is a Svelte project. Tailor responses and code to Svelte conventions.
-- **Jazz Framework:** This project uses the Jazz framework. Adhere to Jazz conventions and best practices.
-  - Read the Jazz documentation and schema templates before making changes.
-  - Use PascalCase for schema names.
-- **Error Handling:** Include proper error handling patterns in all code.
-- **Imports:** Use proper imports from "jazz-tools" (Group, co, z).
-- **Cursor Rules:** This project uses Cursor rules for Jazz schema generation and general help. Refer to the files in `.cursor/rules/` for detailed instructions.
+- **Framework:** This is a SvelteKit project using Svelte 5. Adhere to Svelte conventions.
+- **TypeScript:** Use TypeScript with strict type safety (`tsconfig.json`).
+- **Formatting:** Enforced by Biome (`biome.json`): 2-space indentation, 100-character line width, single quotes for JS/TS.
+- **State Management:** Uses Dexie for IndexedDB and Svelte 5 runic state (`.svelte.ts` files).
+- **Error Handling:** Use `try...catch` blocks for asynchronous operations (e.g., database calls) and log errors with `console.error`.
+
+
