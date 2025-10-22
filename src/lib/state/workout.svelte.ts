@@ -100,6 +100,18 @@ export const updateActiveWorkoutSets = async (exerciseId: number, newWorkingWeig
 }
 
 export const completeWorkout = async () => {
+	const activeWorkout = await getWorkoutSnapshot();
+	if (!activeWorkout) throw new Error("No active workout to complete");
+
+	// Progression logic: Update working weight for all exercises in the completed workout
+	for (const activeExercise of activeWorkout.exercises) {
+		const userExercise = await db.exercises.get(activeExercise.exerciseId);
+		if (userExercise) {
+			const newWeight = userExercise.workingWeight + userExercise.incrementWeight;
+			await db.exercises.update(userExercise.id!, { workingWeight: newWeight });
+		}
+	}
+
 	const workout = await saveActiveWorkoutToHistory();
 
 	// Set the next workout index on the program
@@ -107,7 +119,8 @@ export const completeWorkout = async () => {
 	if (!program) throw new Error('workout program not found')
 	const nextWorkoutIndex = (workout.workoutIndex + 1) % program.workouts.length;
 	await db.programs.update(workout.programId, { nextWorkoutIndex })
-goto(resolve('/'))
+
+	goto(resolve('/'))
 } 
 
 export const completeSet = async (exerciseIndex: number, setIndex: number, reps: number) => {
