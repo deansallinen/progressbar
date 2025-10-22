@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { ActiveSet } from "$lib/db";
 
-	let { set, onCompleteSet } = $props<{ 
-		set: ActiveSet,
-		onCompleteSet: (reps: number) => void
+	let { set, onCompleteSet } = $props<{
+		set: ActiveSet;
+		onCompleteSet: (reps: number) => void;
 	}>();
 
 	let completedReps = $state(set.targetReps);
@@ -20,10 +20,14 @@
 		completedReps = set.targetReps;
 		editing = false;
 	};
+
+	const toggleEditing = () => (editing = !editing);
 </script>
 
-{#if set.completedReps}
-	<span>{set.completedReps}</span>
+{#if set.completedReps && !editing}
+	<button class="outline secondary" onclick={toggleEditing}>
+		{set.completedReps}
+	</button>
 {:else if editing}
 	<!-- Editing -->
 	<div class="flex gap-2 items-center">
