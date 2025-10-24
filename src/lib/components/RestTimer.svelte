@@ -30,9 +30,11 @@
 	});
 </script>
 
-<tr>
-	<td class="">Rest</td>
-	<td class="" colspan="2">
-		<strong class="tabular-nums">{formattedTime}</strong>
+<tr class="text-2xl">
+	<td style="text-align:center;" colspan="3">
+		<div class="flex flex-col jutify-right">
+			<span class="text-sm">Rest</span>
+			<strong class="tabular-nums">{formattedTime}</strong>
+		</div>
 	</td>
 </tr>

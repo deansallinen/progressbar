@@ -30,10 +30,10 @@
 </script>
 
 {#if plateCalculation.length > 0}
-	<div class="flex flex-col gap-0 *:mb-0 *:py-0 *:text-gray-400">
+	<div class="flex flex-col mt-1 gap-0 *:py-0 *:my-0">
 		{#each plateCalculation as { plate, count }}
-			<div class="flex gap-1 text-nowrap tabular-nums">
-				<span>{plate}</span><span> x{count}</span>
+			<div class="flex text-lg text-gray-400 justify-between gap-1 text-nowrap">
+				<span>{plate}</span><span> x<strong>{count}</strong></span>
 			</div>
 		{/each}
 	</div>

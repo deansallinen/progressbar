@@ -11,10 +11,14 @@
 <main class="container">
 	<h1>Dashboard</h1>
 
+	<div class="flex justify-between items-baseline">
+		<h2>My Programs</h2>
+		<a href={resolve("/programs")}>All programs</a>
+	</div>
 	{#if program}
 		<article>
 			<header>
-				<h2>{program.name}</h2>
+				<h3>{program.name}</h3>
 			</header>
 
 			{#if activeWorkout}
@@ -29,7 +33,7 @@
 				<ul class="ml-4">
 					{#each workout.exercises as { exerciseId }}
 						{@const exercise = await db.exercises.get(exerciseId)}
-						<li>{exercise?.name}</li>
+						<li>{exercise?.name} @ {exercise?.workingWeight}</li>
 					{/each}
 				</ul>
 
@@ -48,5 +52,4 @@
 			</footer>
 		</article>
 	{/if}
-	<a href={resolve("/programs")}>Programs</a>
 </main>

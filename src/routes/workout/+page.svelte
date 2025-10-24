@@ -25,16 +25,16 @@
 		<hr />
 		{#each workout.exercises as exercise, exerciseIndex}
 			{#if exercise}
-				<div class="flex gap-2 items-center">
+				<div class="flex gap-2 items-baseline">
 					<h2>{exercise.name}</h2>
 					<TargetWeight {exercise} />
 				</div>
 				<table>
 					<thead>
-						<tr>
+						<tr class="">
 							<th>Set</th>
 							<th>Target</th>
-							<th>Completed Reps</th>
+							<th style="text-align:right;">Completed Reps</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -42,19 +42,21 @@
 							{#each exercise.sets as set, setIndex}
 								{#if set}
 									<tr>
-										<td>{setIndex + 1}</td>
-										<td>
+										<td class="align-top">{setIndex + 1}</td>
+										<td class="align-top">
 											<div class="">
 												<span class="text-nowrap">
-													<strong>{set.targetWeight}</strong>
+													<strong class="text-xl">{set.targetWeight}</strong>
 													{#if $settings}
 														{$settings.weightUnit}
 													{/if}
 												</span>
-												<PlateCalculator weight={set.targetWeight} />
+												{#if !set.completedAt}
+													<PlateCalculator weight={set.targetWeight} />
+												{/if}
 											</div>
 										</td>
-										<td>
+										<td class="align-top">
 											<CompleteSetButton
 												{set}
 												onCompleteSet={(reps) =>
