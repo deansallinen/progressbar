@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { exercises } from "$lib/state/exercise.svelte";
   import {
     settings,
-    exercises,
     handleNameChange,
     handleUnitChange,
     handleUserWeightChange,
@@ -9,7 +9,6 @@
     handlePlatesChange,
     handleExerciseNumberChange,
   } from "$lib/state/settings.svelte";
-  import type { UserExercise } from "$lib/db";
 </script>
 
 <main class="container">

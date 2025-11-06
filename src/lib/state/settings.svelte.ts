@@ -3,8 +3,6 @@ import { liveQuery } from "dexie";
 
 export const settings = liveQuery(() => db.settings.get(1));
 
-export const exercises = liveQuery(() => db.exercises.toArray());
-
 export const handleExerciseNumberChange = (id: number, key: 'workingWeight' | 'goalWeight' | 'incrementWeight') => (e: Event) => {
   const target = e.target as HTMLInputElement;
   const value = parseFloat(target.value);

@@ -11,6 +11,8 @@
 		createActiveWorkout,
 	} from "$lib/state/workout.svelte";
 	import { onMount } from "svelte";
+	import ExerciseProgress from "$lib/components/ExerciseProgress.svelte";
+	import { getExerciseById } from "$lib/state/exercise.svelte";
 
 	const workout = $derived($activeWorkoutStore);
 
@@ -29,6 +31,10 @@
 					<h2>{exercise.name}</h2>
 					<TargetWeight {exercise} />
 				</div>
+				{@const userExercise = await getExerciseById(exercise.exerciseId)}
+				{#if userExercise}
+					<ExerciseProgress exercise={userExercise} />
+				{/if}
 				<table>
 					<thead>
 						<tr class="">
