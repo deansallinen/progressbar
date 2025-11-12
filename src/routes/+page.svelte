@@ -11,28 +11,32 @@
 </script>
 
 <main class="container">
-	<h1>Dashboard</h1>
+	<!-- <h1>Dashboard</h1> -->
 
 	<section>
 		<div class="flex justify-between items-baseline">
-			<h2>My Programs</h2>
+			<h2>Active Program</h2>
 			<a href={resolve("/programs")}>All programs</a>
 		</div>
 
 		{#if program}
 			<article>
 				<header>
-					<h3>{program.name}</h3>
+					<hgroup>
+						<h3>{program.name}</h3>
+						<p>{program.phases[program.currentPhaseIndex].name}</p>
+					</hgroup>
 				</header>
 
 				{#if activeWorkout}
-					<p>Continue {activeWorkout.name}</p>
+					<p>Continue {activeWorkout.name}-{program.workoutCount}</p>
 					<footer>
 						<a href={resolve("/workout")} role="button">Continue</a>
 					</footer>
 				{:else}
-					{@const workout = program.workouts[program.nextWorkoutIndex]}
-					<p>Next workout: {workout.name}</p>
+					{@const currentPhase = program.phases[program.currentPhaseIndex]}
+					{@const workout = currentPhase.workouts[program.nextWorkoutIndex]}
+					<p>Next workout: {workout.name}-{program.workoutCount + 1}</p>
 
 					<ul class="ml-4">
 						{#each workout.exercises as { exerciseId }}

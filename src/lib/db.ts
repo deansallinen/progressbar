@@ -4,9 +4,17 @@ export interface TemplateProgram {
 	id: number;
 	name: string;
 	description?: string;
-	workouts: TemplateWorkout[]
+	phases: TemplatePhase[];
+	currentPhaseIndex: number;
 	nextWorkoutIndex: number;
 	workoutCount: number;
+	phaseWorkoutCount: number;
+}
+
+export interface TemplatePhase {
+	name: string;
+	duration: number;
+	workouts: TemplateWorkout[];
 }
 
 export interface TemplateWorkout {
@@ -104,6 +112,31 @@ export class ProgressBarDB extends Dexie {
 			activeWorkout: "id", // singleton table
 			workoutHistory: "++id, programId",
 			recordedSets: "++id, exerciseId, workoutHistoryId"
+		});
+
+		// Setting workoutCount for users with existing workouts
+		this.version(2).upgrade(async () => {
+			const programs = await db.programs.toArray();
+			for (const program of programs) {
+				const count = await db.workoutHistory.where('programId').equals(program.id).count();
+				await db.programs.update(program.id, { workoutCount: count });
+			}
+		});
+
+		this.version(3).upgrade(async () => {
+			const programs = await db.programs.toArray();
+			for (const program of programs) {
+				if (program.phases) continue; // already migrated
+				// Assume old program has workouts
+				const oldProgram = program as any;
+				if (oldProgram.workouts) {
+					await db.programs.update(program.id, {
+						phases: [{ name: "Phase 1", duration: 1000, workouts: oldProgram.workouts }],
+						currentPhaseIndex: 0,
+						phaseWorkoutCount: 0
+					});
+				}
+			}
 		});
 
 		this.on("populate", () => this.populate());
@@ -221,11 +254,17 @@ export class ProgressBarDB extends Dexie {
 			],
 		}
 
-		const defaultProgram = await this.programs.add({name: 'Radically Simple Strength', 
+		const defaultProgram = await this.programs.add({name: 'Radically Simple Strength',
 			description: "A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
-			workouts: [workoutA, workoutB],
+			phases: [
+				{ name: "Phase 1", duration: 12, workouts: [workoutA, workoutB] },
+				{ name: "Phase 2", duration: 12, workouts: [workoutA, workoutB] },
+				{ name: "Phase 3", duration: 0, workouts: [workoutA, workoutB] },
+			],
+			currentPhaseIndex: 0,
 			nextWorkoutIndex: 0,
-			workoutCount: 0
+			workoutCount: 0,
+			phaseWorkoutCount: 0
 		});
 		console.log('Added program', defaultProgram)
 

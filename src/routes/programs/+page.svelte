@@ -18,14 +18,14 @@
 				<header>
 					<hgroup>
 						<h2>{program.name}</h2>
-						<p>{program.workouts.length} workouts</p>
+						<p>{program.phases.reduce((sum, p) => sum + p.workouts.length, 0)} workouts</p>
 					</hgroup>
 				</header>
 
 				<p>{program.description}</p>
 
 				<div class="grid">
-					{#each program.workouts as workout}
+					{#each program.phases.flatMap(p => p.workouts) as workout}
 						<div>
 							<h3>{workout.name}</h3>
 							<ul>

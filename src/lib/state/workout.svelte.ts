@@ -36,9 +36,10 @@ export const createActiveWorkout = async () => {
 		return undefined;
 	}
 
-	const workoutTemplate = program.workouts[program.nextWorkoutIndex];
+	const currentPhase = program.phases[program.currentPhaseIndex];
+	const workoutTemplate = currentPhase.workouts[program.nextWorkoutIndex];
 	if (!workoutTemplate) {
-		throw new Error(`Workout index ${program.nextWorkoutIndex} not found in program ${program.name}`);
+		throw new Error(`Workout index ${program.nextWorkoutIndex} not found in phase ${currentPhase.name} of program ${program.name}`);
 	}
 
 	const activeExercises: ActiveExercise[] = [];
@@ -76,6 +77,8 @@ export const createActiveWorkout = async () => {
 	};
 
 	await db.activeWorkout.put(newActiveWorkout);
+	await db.programs.update(program.id, {workoutCount: program.workoutCount + 1})
+
 	console.log("Started new workout and saved to ActiveWorkout table.");
 	return newActiveWorkout;
 }
@@ -117,8 +120,16 @@ export const completeWorkout = async () => {
 	// Set the next workout index on the program
 	const program = await db.programs.get(workout.programId)
 	if (!program) throw new Error('workout program not found')
-	const nextWorkoutIndex = (workout.workoutIndex + 1) % program.workouts.length;
-	await db.programs.update(workout.programId, { nextWorkoutIndex })
+	const currentPhase = program.phases[program.currentPhaseIndex];
+	const nextWorkoutIndex = (workout.workoutIndex + 1) % currentPhase.workouts.length;
+	const newPhaseWorkoutCount = program.phaseWorkoutCount + 1;
+	let updates: any = { nextWorkoutIndex, workoutCount: program.workoutCount + 1, phaseWorkoutCount: newPhaseWorkoutCount };
+	if (newPhaseWorkoutCount >= currentPhase.duration) {
+		updates.currentPhaseIndex = program.currentPhaseIndex + 1;
+		updates.phaseWorkoutCount = 0;
+		updates.nextWorkoutIndex = 0;
+	}
+	await db.programs.update(workout.programId, updates)
 
 	goto(resolve('/'))
 } 
