@@ -32,8 +32,16 @@
 {#if plateCalculation.length > 0}
 	<div class="flex flex-col mt-1 gap-0 *:py-0 *:my-0">
 		{#each plateCalculation as { plate, count }}
-			<div class="flex text-lg text-gray-400 justify-between gap-1 text-nowrap">
-				<span>{plate}</span><span> x<strong>{count}</strong></span>
+			<div
+				class="flex text-lg text-gray-400 justify-between gap-1.5 text-nowrap"
+			>
+				<span class="tabular-nums">{plate}</span>
+				<span class="tabular-nums">
+					x
+					<strong class:text-gray-300={count > 1}>
+						{count}
+					</strong>
+				</span>
 			</div>
 		{/each}
 	</div>
