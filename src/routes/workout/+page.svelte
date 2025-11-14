@@ -13,6 +13,7 @@
 	import { onMount } from "svelte";
 	import ExerciseProgress from "$lib/components/ExerciseProgress.svelte";
 	import { getExerciseById } from "$lib/state/exercise.svelte";
+	import ExerciseNotes from "$lib/components/ExerciseNotes.svelte";
 
 	const workout = $derived($activeWorkoutStore);
 
@@ -35,6 +36,7 @@
 					</div>
 					{#if userExercise}
 						<ExerciseProgress exercise={userExercise} />
+						<ExerciseNotes exercise={userExercise} />
 					{/if}
 					<table>
 						<thead>

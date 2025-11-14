@@ -39,6 +39,7 @@ export interface UserExercise {
 	workingWeight: number;
 	goalWeight: number;
 	incrementWeight: number;
+	note?: string;
 }
 
 export interface ActiveWorkout {
