@@ -12,7 +12,7 @@ function allSetsMeetProgressionCriteria(activeExercise: ActiveExercise, template
 	);
 }
 
-function shouldIncrementExercise(activeExercise: ActiveExercise, templateExercise: TemplateExercise): boolean {
+function shouldIncrementWeight(activeExercise: ActiveExercise, templateExercise: TemplateExercise): boolean {
 	if (templateExercise.progressionType === 'linear') {
 		// Linear increases if working set meets rep target
 		const workingSet = activeExercise.sets.find(s => s.initialPercentage === 1.0)
@@ -38,17 +38,20 @@ export async function progressExercise(activeExercise: ActiveExercise, templateE
 	const userExercise = await db.exercises.get(activeExercise.exerciseId)
 	if (!userExercise) throw new Error('exercise not found')
 
-	if (shouldIncrementExercise(activeExercise, templateExercise)) {
+	if (shouldIncrementWeight(activeExercise, templateExercise)) {
+		console.log(`should increment weight for ${activeExercise.name}`)
 		// if working set met target reps, increment weight and reset stall counter
 		const newWeight = userExercise.workingWeight + userExercise.incrementWeight 
 		await db.exercises.update(userExercise.id!, { workingWeight: newWeight, stalls: 0 });
 		return 
 	} else {
+		console.log(`stalled for ${activeExercise.name}`)
 		// if target not met, stay at current weight and increment stall counter
 		await db.exercises.update(userExercise.id!, { stalls: userExercise.stalls++ });
 	}
 
 	if (userExercise.stalls >= 2) {
+		console.log(`resetting for ${activeExercise.name}`)
 		resetExercise(userExercise)
 	} 
 }

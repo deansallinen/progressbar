@@ -1,6 +1,6 @@
 <script lang="ts">
   import { db, type ActiveExercise } from "$lib/db";
-  import { updateActiveWorkoutSets } from "$lib/state/workout.svelte";
+  import { updateActiveWorkoutSets } from "$lib/functions";
   import { liveQuery } from "dexie";
 
   interface Props {
@@ -13,6 +13,7 @@
     exerciseId: number,
     workingWeight: number,
   ) => {
+    console.log("setting workout weight");
     await db.exercises.update(exerciseId, { workingWeight });
     await updateActiveWorkoutSets(exerciseId, workingWeight);
   };

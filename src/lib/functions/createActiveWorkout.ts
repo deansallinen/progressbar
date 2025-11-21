@@ -1,6 +1,7 @@
 import { db, type ActiveExercise, type ActiveSet, type ActiveWorkout } from "$lib/db";
 import { getActiveProgram } from "$lib/state/program.svelte";
 import { calculateSetWeight } from "./calculateSetWeight";
+import { getSmallestWeight } from "./getSmallestWeight";
 
 export const createActiveWorkout = async () => {
 	const existingActiveWorkout = await db.activeWorkout.get(1); 
@@ -26,6 +27,8 @@ export const createActiveWorkout = async () => {
 	const activeExercises: ActiveExercise[] = [];
 	const allUserExercises = await db.exercises.toArray();
 
+	const smallestWeight = await getSmallestWeight()
+
 	for (const templateExercise of workoutTemplate.exercises) {
 		const userExercise = allUserExercises.find(e => e.id === templateExercise.exerciseId);
 
@@ -36,11 +39,12 @@ export const createActiveWorkout = async () => {
 		let activeSets: ActiveSet[] = templateExercise.sets.map((set, index) => { 
 			// if the exercise is in a reset, the working set is AMRAP a.k.a. Infinity
 			const targetReps = userExercise.resets && set.targetPercentage === 1.0 ? Infinity : set.targetReps;
+			const targetWeight = calculateSetWeight(set, userExercise, smallestWeight)
 
 			return {
 				setIndex: index,
 				targetReps, 
-				targetWeight: calculateSetWeight(set, userExercise),
+				targetWeight,
 				initialPercentage: set.targetPercentage || 1
 			} 
 		});

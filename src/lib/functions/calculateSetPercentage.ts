@@ -1,5 +1,8 @@
-export const calculateSetPercentage = (percentage: number, weight: number) => {
-	// TODO: round to nearest lowest available plate for when 1.25lb plates are added
-	return Math.round((percentage * weight) / 5) * 5 // round to nearest 5
+
+export function calculateSetPercentage(percentage: number, weight: number, smallestWeight: number) {
+	console.log(percentage, weight, smallestWeight)
+	const roundingIncrement = smallestWeight * 2; 
+	const targetWeight = percentage * weight;
+	return Math.round(targetWeight / roundingIncrement) * roundingIncrement 
 }
 

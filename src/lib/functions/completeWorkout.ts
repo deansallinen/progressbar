@@ -1,10 +1,12 @@
 import { goto } from "$app/navigation";
 import { resolve } from "$app/paths";
 import { db } from "$lib/db";
+import { setNextWorkout } from "./setNextWorkout";
 import { progressExercise } from "./progressExercise";
 import { saveWorkoutToHistory } from "./saveWorkoutToHistory";
 
 export const completeWorkout = async () => {
+	console.log('completing workout')
 	const activeWorkout = await db.activeWorkout.get(1);
 	if (!activeWorkout) throw new Error("No active workout to complete");
 
@@ -22,18 +24,7 @@ export const completeWorkout = async () => {
 		progressExercise(activeExercise, templateExercise)
 	}
 
-	// Set the next workout index on the program
-
-	// const nextWorkoutIndex = (savedWorkout.workoutIndex + 1) % currentPhase.workouts.length;
-	// const newPhaseWorkoutCount = program.phaseWorkoutCount + 1;
-
-	let updates: any = { nextWorkoutIndex, workoutCount: program.workoutCount + 1, phaseWorkoutCount: newPhaseWorkoutCount };
-	if (newPhaseWorkoutCount >= currentPhase.duration) {
-		updates.currentPhaseIndex = program.currentPhaseIndex + 1;
-		updates.phaseWorkoutCount = 0;
-		updates.nextWorkoutIndex = 0;
-	}
-	await db.programs.update(savedWorkout.programId, updates)
+	await setNextWorkout(program, savedWorkout)
 
 	goto(resolve('/'))
 } 

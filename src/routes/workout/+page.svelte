@@ -41,8 +41,9 @@
 						<thead>
 							<tr class="">
 								<th>Set</th>
-								<th>Target</th>
-								<th style="text-align:right;">Completed Reps</th>
+								<th>Weight</th>
+								<th>Reps</th>
+								<th style="text-align:right;">Completed</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -64,6 +65,7 @@
 													{/if}
 												</div>
 											</td>
+											<td>{set.targetReps}</td>
 											<td class="align-top">
 												<CompleteSetButton
 													{set}

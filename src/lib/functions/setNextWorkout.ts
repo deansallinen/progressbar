@@ -10,14 +10,19 @@ const nextWorkoutInCurrentPhase = (program: TemplateProgram, lastWorkoutIndex:nu
 	})
 }
 
-export const findNextWorkout = async (program: TemplateProgram, lastWorkout: ActiveWorkout | WorkoutHistory ) => {
+export const setNextWorkout = async (program: TemplateProgram, lastWorkout: ActiveWorkout | WorkoutHistory ) => {
+	console.log('finding next workout')
+	console.log(JSON.stringify(program.id, null, 2))
 	// Novice program
-	if (program.id === 0 ) {
+	if (program.id === 1 ) {
+		console.log('novice program')
 		const currentPhaseIndex = program.currentPhaseIndex
 		const workoutCount = program.workoutCount
 
 		if (currentPhaseIndex === 0) {
+			console.log('first phase')
 			if (workoutCount > 12) {
+				console.log('should progress to phase 2')
 				// Next phase
 				db.programs.update(program.id, {
 					currentPhaseIndex: 1,
@@ -25,14 +30,18 @@ export const findNextWorkout = async (program: TemplateProgram, lastWorkout: Act
 					nextWorkoutIndex: 0
 				})
 			} else {
+				console.log('should do next workout in phase 1')
 				nextWorkoutInCurrentPhase(program, lastWorkout.workoutIndex)
 			}
 		}
 
 		if (currentPhaseIndex === 1) {
+			console.log('second phase')
 			if (workoutCount > 24) {
+				console.log('should progress to phase 3')
 				db.programs.update(program.id, {currentPhaseIndex: 2, phaseWorkoutCount: 0})
 			} else {
+				console.log('should do next workout in phase 2')
 				nextWorkoutInCurrentPhase(program, lastWorkout.workoutIndex)
 			}
 		}

@@ -8,7 +8,7 @@
 
 {#if props.exercise.goalWeight}
 	<progress
-		value={props.exercise.workingWeight}
+		value={props.exercise.workingWeight || 0}
 		max={props.exercise.goalWeight}
 	>
 	</progress>
