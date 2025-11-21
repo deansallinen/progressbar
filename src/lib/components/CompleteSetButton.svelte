@@ -1,39 +1,35 @@
 <script lang="ts">
 	import type { ActiveSet } from "$lib/db";
 
-	let { set, onCompleteSet } = $props<{
+	interface Props {
 		set: ActiveSet;
 		onCompleteSet: (reps: number) => void;
-	}>();
+	}
 
-	let completedReps = $state(set.targetReps);
+	let { set, onCompleteSet }: Props = $props();
+
+	let workingReps = $state(set.targetReps === Infinity ? 10 : set.targetReps);
 	let editing = $state(false);
 
 	const handleComplete = (e: Event) => {
 		e.preventDefault();
 		editing = false;
-		onCompleteSet(completedReps);
-	};
-
-	const handleCancel = (e: Event) => {
-		e.preventDefault();
-		completedReps = set.targetReps;
-		editing = false;
+		onCompleteSet(workingReps);
 	};
 
 	const toggleEditing = () => (editing = !editing);
 </script>
 
-{#if set.completedReps && !editing}
+{#if set.completedReps !== undefined && !editing}
 	<div class="flex justify-end">
 		<button
 			class="outline secondary"
 			onclick={toggleEditing}
 			style="padding: 0; border:none;"
 		>
-			{#if set.completedReps < set.targetReps}
+			{#if set.completedReps < set.minReps}
 				<span class="text-red-300">
-					{set.completedReps} reps
+					{set.completedReps} reps of {set.minReps}
 				</span>
 			{:else}
 				<ins>
@@ -43,23 +39,12 @@
 		</button>
 	</div>
 {:else if editing}
-	<!-- Editing -->
-	<div class="flex gap-2 items-center">
-		<input
-			type="number"
-			placeholder="Enter reps"
-			value={set.completedReps || set.targetReps}
-			required
-			oninput={(e) => {
-				e.preventDefault();
-				completedReps = e.currentTarget.valueAsNumber;
-			}}
-		/>
+	<div class="flex justify-end items-center gap-2">
 		<button
-			aria-label="Cancel editing"
+			class="outline"
+			aria-label="Decrement Reps"
 			type="button"
-			class="secondary outline"
-			onclick={handleCancel}
+			onclick={() => workingReps--}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -71,11 +56,23 @@
 				stroke-width="2"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				class="lucide lucide-x-icon lucide-x"
-				><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+				class="lucide lucide-minus-icon lucide-minus"><path d="M5 12h14" /></svg
 			>
 		</button>
-		<button aria-label="Complete Reps" type="button" onclick={handleComplete}>
+		<button
+			class="min-w-12"
+			aria-label="Complete Reps"
+			type="button"
+			onclick={handleComplete}
+		>
+			{workingReps}
+		</button>
+		<button
+			class="outline"
+			aria-label="Increment Reps"
+			type="button"
+			onclick={() => workingReps++}
+		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"
@@ -86,22 +83,20 @@
 				stroke-width="2"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				class="lucide lucide-check-icon lucide-check"
-				><path d="M20 6 9 17l-5-5" /></svg
+				class="lucide lucide-plus-icon lucide-plus"
+				><path d="M5 12h14" /><path d="M12 5v14" /></svg
 			>
 		</button>
 	</div>
 {:else}
 	<!-- Default view -->
-	<div class="flex items-center gap-2">
-		<input
-			type="number"
-			class="w-0"
-			readonly
-			placeholder={`${completedReps} reps`}
-			onclick={() => (editing = !editing)}
-		/>
-		<button aria-label="Complete Reps" type="button" onclick={handleComplete}>
+	<div class="flex justify-end items-center gap-2">
+		<button
+			class="outline"
+			aria-label="Decrement Reps"
+			type="button"
+			onclick={() => workingReps--}
+		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"
@@ -112,8 +107,35 @@
 				stroke-width="2"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				class="lucide lucide-check-icon lucide-check"
-				><path d="M20 6 9 17l-5-5" /></svg
+				class="lucide lucide-minus-icon lucide-minus"><path d="M5 12h14" /></svg
+			>
+		</button>
+		<button
+			class="min-w-12"
+			aria-label="Complete Reps"
+			type="button"
+			onclick={handleComplete}
+		>
+			{workingReps}
+		</button>
+		<button
+			class="outline"
+			aria-label="Increment Reps"
+			type="button"
+			onclick={() => workingReps++}
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-plus-icon lucide-plus"
+				><path d="M5 12h14" /><path d="M12 5v14" /></svg
 			>
 		</button>
 	</div>

@@ -43,6 +43,7 @@ export const createActiveWorkout = async () => {
 
 			return {
 				setIndex: index,
+				minReps: set.minReps,
 				targetReps, 
 				targetWeight,
 				initialPercentage: set.targetPercentage || 1

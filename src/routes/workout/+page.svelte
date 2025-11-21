@@ -6,7 +6,6 @@
 	import { settings } from "$lib/state/settings.svelte";
 	import { onMount } from "svelte";
 	import ExerciseProgress from "$lib/components/ExerciseProgress.svelte";
-	import { getExerciseById } from "$lib/state/exercise.svelte";
 	import ExerciseNotes from "$lib/components/ExerciseNotes.svelte";
 	import { completeSet, completeWorkout } from "$lib/functions";
 	import { createActiveWorkout } from "$lib/functions/createActiveWorkout";
@@ -27,7 +26,7 @@
 		<hr />
 		{#each workout.exercises as exercise, exerciseIndex}
 			{#if exercise}
-				{@const userExercise = await getExerciseById(exercise.exerciseId)}
+				{@const userExercise = await db.exercises.get(exercise.exerciseId)}
 				<section>
 					<div class="flex gap-2 items-baseline">
 						<h2>{exercise.name}</h2>
@@ -65,7 +64,11 @@
 													{/if}
 												</div>
 											</td>
-											<td>{set.targetReps}</td>
+											<td class="align-top"
+												>{set.targetReps === Infinity
+													? "AMRAP"
+													: set.targetReps}</td
+											>
 											<td class="align-top">
 												<CompleteSetButton
 													{set}

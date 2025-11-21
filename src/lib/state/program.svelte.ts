@@ -7,6 +7,7 @@ import { startNoviceProgram } from "$lib/programs/novice";
 export const programs = liveQuery(() => db.programs.toArray());
 
 export const getActiveProgram = async (): Promise<TemplateProgram> => {
+	console.log('getting active program')
 	const settings = await db.settings.get(1)
 	let programId = settings?.activeProgramId
 	if (programId) {

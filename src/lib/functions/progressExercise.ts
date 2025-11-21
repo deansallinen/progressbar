@@ -39,15 +39,16 @@ export async function progressExercise(activeExercise: ActiveExercise, templateE
 	if (!userExercise) throw new Error('exercise not found')
 
 	if (shouldIncrementWeight(activeExercise, templateExercise)) {
-		console.log(`should increment weight for ${activeExercise.name}`)
 		// if working set met target reps, increment weight and reset stall counter
+		console.log(`should increment weight for ${activeExercise.name}`)
 		const newWeight = userExercise.workingWeight + userExercise.incrementWeight 
 		await db.exercises.update(userExercise.id!, { workingWeight: newWeight, stalls: 0 });
 		return 
 	} else {
-		console.log(`stalled for ${activeExercise.name}`)
 		// if target not met, stay at current weight and increment stall counter
-		await db.exercises.update(userExercise.id!, { stalls: userExercise.stalls++ });
+		const newStalls = userExercise.stalls + 1
+		console.log(`stalled for ${activeExercise.name} with ${newStalls} stalls`)
+		await db.exercises.update(userExercise.id!, { stalls: newStalls });
 	}
 
 	if (userExercise.stalls >= 2) {

@@ -11,17 +11,16 @@ const nextWorkoutInCurrentPhase = (program: TemplateProgram, lastWorkoutIndex:nu
 }
 
 export const setNextWorkout = async (program: TemplateProgram, lastWorkout: ActiveWorkout | WorkoutHistory ) => {
-	console.log('finding next workout')
-	console.log(JSON.stringify(program.id, null, 2))
+	console.log('finding next workout for program id', program.id)
 	// Novice program
 	if (program.id === 1 ) {
-		console.log('novice program')
 		const currentPhaseIndex = program.currentPhaseIndex
 		const workoutCount = program.workoutCount
+		console.log('novice program, phase', currentPhaseIndex)
 
 		if (currentPhaseIndex === 0) {
 			console.log('first phase')
-			if (workoutCount > 12) {
+			if (workoutCount >= 12) {
 				console.log('should progress to phase 2')
 				// Next phase
 				db.programs.update(program.id, {
@@ -37,7 +36,7 @@ export const setNextWorkout = async (program: TemplateProgram, lastWorkout: Acti
 
 		if (currentPhaseIndex === 1) {
 			console.log('second phase')
-			if (workoutCount > 24) {
+			if (workoutCount >= 24) {
 				console.log('should progress to phase 3')
 				db.programs.update(program.id, {currentPhaseIndex: 2, phaseWorkoutCount: 0})
 			} else {
@@ -47,6 +46,7 @@ export const setNextWorkout = async (program: TemplateProgram, lastWorkout: Acti
 		}
 
 		if (currentPhaseIndex === 2) {
+			console.log('third phase')
 			// Rule: Novice phase ends when squat stalls repeatedly.
 			const squat = await db.exercises.where('name').equals('Squat').first()
 			if (!squat) throw new Error('Squat should exist')

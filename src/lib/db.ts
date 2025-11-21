@@ -1,4 +1,4 @@
-import Dexie, { type EntityTable, } from "dexie";
+import Dexie, { type EntityTable, type Transaction, } from "dexie";
 import { createNoviceProgram } from "./programs/novice";
 
 export interface TemplateProgram {
@@ -71,6 +71,7 @@ export interface ActiveSet {
 	completedReps?: number; // Reps actually done
 	completedWeight?: number; // Weight actually used
 	completedAt?: Date;
+	minReps: number;
 }
 
 export interface WorkoutHistory {
@@ -121,29 +122,18 @@ export class ProgressBarDB extends Dexie {
 		});
 
 		// Setting workoutCount for users with existing workouts
-		this.version(2).upgrade(async () => {
-			const programs = await db.programs.toArray();
+		this.version(2).upgrade(async (trans) => {
+			const programs = await trans.table("programs").toArray();
+			const historyTable = trans.table("workoutHistory");
 			for (const program of programs) {
-				const count = await db.workoutHistory.where('programId').equals(program.id).count();
-				await db.programs.update(program.id, { workoutCount: count });
+				const count = await historyTable.where('programId').equals(program.id).count();
+				await trans.table('programs').update(program.id, { workoutCount: count });
 			}
 		});
 
-		this.version(3).upgrade(async () => {
-			const programs = await db.programs.toArray();
-			for (const program of programs) {
-				if (program.phases) continue; // already migrated
-				// Assume old program has workouts
-				const oldProgram = program
-				const newProgram = await createNoviceProgram()
-				await db.programs.update(program.id, {...newProgram, workoutCount: oldProgram.workoutCount, nextWorkoutIndex: oldProgram.nextWorkoutIndex })
-			}
-
-			const exercises = await db.exercises.toArray()
-			for (const exercise of exercises) {
-				if (exercise.stalls) continue; // already migrated
-				await db.exercises.update(exercise.id, {stalls: 0})
-			}
+		this.version(3).upgrade(async (trans) => {
+			await migrateExercises(trans)
+			await migratePrograms(trans)
 		});
 
 		this.on("populate", () => this.populate());
@@ -160,5 +150,54 @@ export class ProgressBarDB extends Dexie {
 		console.log("Database seeded successfully.");
 	}
 }
+
+	async function migrateExercises(trans: Transaction) {
+		await trans.table("exercises").toCollection().modify(exercise => {
+			if (exercise.stalls === undefined) exercise.stalls = 0;
+			if (exercise.resets === undefined) exercise.resets = 0;
+		});
+	}
+
+	async function migratePrograms(trans: Transaction) {
+		await trans.table("programs").toCollection().modify(program => {
+			if (program.phases) return; 
+
+			const oldWorkouts = program.workouts || [];
+			
+			// 1. Transform old workouts to match new TemplateWorkout interface
+			// (Adding progressionType to exercises, minReps to sets)
+			const newWorkouts = oldWorkouts.map((w: any) => ({
+				name: w.name,
+				exercises: (w.exercises || []).map((e: any) => ({
+					exerciseId: e.exerciseId,
+					progressionType: 'linear', // Default for existing data
+					sets: (e.sets || []).map((s: any) => ({
+						...s,
+						// Ensure targetReps exists (default to 5 if missing from old data)
+						targetReps: s.targetReps ?? 5, 
+						// Default minReps to targetReps for existing linear programs
+						minReps: s.targetReps ?? 5 
+					}))
+				}))
+			}));
+
+			// 2. Create the Phase structure
+			// We wrap the existing workouts into a single "Linear Phase"
+			program.phases = [{
+				name: "Phase 1", // Generic name or "Linear Progression"
+				duration: 0, // 0 implies indefinite/until stall
+				workouts: newWorkouts
+			}];
+
+			// 3. Set new root properties
+			program.currentPhaseIndex = 0;
+			// Initialize phaseWorkoutCount based on total count, or 0 if you want to track phase specific progress
+			program.phaseWorkoutCount = 0; 
+
+			// 4. Remove old root properties that are no longer in the interface
+			delete program.workouts;
+		});
+	}
+
 
 export const db = new ProgressBarDB();

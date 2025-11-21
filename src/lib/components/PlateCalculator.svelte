@@ -33,7 +33,7 @@
 	<div class="flex flex-col mt-1 gap-0 *:py-0 *:my-0">
 		{#each plateCalculation as { plate, count }}
 			<div
-				class="flex text-lg text-gray-400 justify-between gap-1.5 text-nowrap"
+				class="flex text-lg text-gray-400 justify-between max-w-20 gap-1.5 text-nowrap"
 			>
 				<span class="tabular-nums">{plate}</span>
 				<span class="tabular-nums">

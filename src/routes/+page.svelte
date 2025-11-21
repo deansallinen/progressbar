@@ -11,8 +11,6 @@
 </script>
 
 <main class="container">
-	<!-- <h1>Dashboard</h1> -->
-
 	<section>
 		<div class="flex justify-between items-baseline">
 			<h2>Active Program</h2>
