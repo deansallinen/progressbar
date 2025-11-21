@@ -4,17 +4,16 @@
 	import CompleteSetButton from "$lib/components/CompleteSetButton.svelte";
 	import RestTimer from "$lib/components/RestTimer.svelte";
 	import { settings } from "$lib/state/settings.svelte";
-	import {
-		activeWorkoutStore,
-		completeSet,
-		completeWorkout,
-		createActiveWorkout,
-	} from "$lib/state/workout.svelte";
 	import { onMount } from "svelte";
 	import ExerciseProgress from "$lib/components/ExerciseProgress.svelte";
 	import { getExerciseById } from "$lib/state/exercise.svelte";
 	import ExerciseNotes from "$lib/components/ExerciseNotes.svelte";
+	import { completeSet, completeWorkout } from "$lib/functions";
+	import { createActiveWorkout } from "$lib/functions/createActiveWorkout";
+	import { liveQuery } from "dexie";
+	import { db } from "$lib/db";
 
+	const activeWorkoutStore = liveQuery(() => db.activeWorkout.get(1));
 	const workout = $derived($activeWorkoutStore);
 
 	onMount(() => {

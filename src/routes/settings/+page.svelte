@@ -129,11 +129,5 @@
         </section>
       </div>
     </div>
-    <!-- <pre> -->
-    <!--   {JSON.stringify($settings, null, 2)} -->
-    <!-- </pre> -->
-    <!-- <pre> -->
-    <!--   {JSON.stringify($exercises, null, 2)} -->
-    <!-- </pre> -->
   {/if}
 </main>

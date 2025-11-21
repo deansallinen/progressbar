@@ -6,5 +6,10 @@
 	} = $props();
 </script>
 
-<progress value={props.exercise.workingWeight} max={props.exercise.goalWeight}>
-</progress>
+{#if props.exercise.goalWeight}
+	<progress
+		value={props.exercise.workingWeight}
+		max={props.exercise.goalWeight}
+	>
+	</progress>
+{/if}

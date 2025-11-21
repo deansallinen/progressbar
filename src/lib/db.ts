@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable, } from "dexie";
+import { createNoviceProgram } from "./programs/novice";
 
 export interface TemplateProgram {
 	id: number;
@@ -25,21 +26,25 @@ export interface TemplateWorkout {
 export interface TemplateExercise {
 	exerciseId: number; // index
 	sets: TemplateSet[]
+	progressionType: 'linear' | 'rep_based' ;
 }
 
 export interface TemplateSet {
-	targetReps?: number;
+	targetReps: number;
 	targetWeight?: number;
 	targetPercentage?: number;
+	minReps: number;
 }
 
 export interface UserExercise {
 	id?:number;
 	name: string;
 	workingWeight: number;
-	goalWeight: number;
+	goalWeight?: number;
 	incrementWeight: number;
 	note?: string;
+	resets?: number;
+	stalls: number;
 }
 
 export interface ActiveWorkout {
@@ -129,14 +134,15 @@ export class ProgressBarDB extends Dexie {
 			for (const program of programs) {
 				if (program.phases) continue; // already migrated
 				// Assume old program has workouts
-				const oldProgram = program as any;
-				if (oldProgram.workouts) {
-					await db.programs.update(program.id, {
-						phases: [{ name: "Phase 1", duration: 1000, workouts: oldProgram.workouts }],
-						currentPhaseIndex: 0,
-						phaseWorkoutCount: 0
-					});
-				}
+				const oldProgram = program
+				const newProgram = await createNoviceProgram()
+				await db.programs.update(program.id, {...newProgram, workoutCount: oldProgram.workoutCount, nextWorkoutIndex: oldProgram.nextWorkoutIndex })
+			}
+
+			const exercises = await db.exercises.toArray()
+			for (const exercise of exercises) {
+				if (exercise.stalls) continue; // already migrated
+				await db.exercises.update(exercise.id, {stalls: 0})
 			}
 		});
 
@@ -148,127 +154,6 @@ export class ProgressBarDB extends Dexie {
 	 * automatically by the 'populate' event handler.
 	 */
 	async populate() {
-		console.log("Database is being created. Seeding with initial data...");
-
-		const [squatId, benchId, deadliftId, ohpId] = await Promise.all([
-			this.exercises.add({
-				name: "Squat",
-				incrementWeight: 5,
-				workingWeight: 45,
-				goalWeight: 315
-			}),
-			this.exercises.add({
-				name: "Bench Press",
-				incrementWeight: 5,
-				workingWeight: 45,
-				goalWeight: 225
-			}),
-			this.exercises.add({
-				name: "Deadlift",
-				incrementWeight: 10,
-				workingWeight: 45,
-				goalWeight: 405
-			}),
-			this.exercises.add({
-				name: "Overhead Press",
-				incrementWeight: 5,
-				workingWeight: 45,
-				goalWeight: 135
-			}),
-		]);
-		console.log("added exercises")
-
-		if (!squatId || !benchId || !deadliftId || !ohpId) {
-			throw new Error("Couldn't seed exercises")
-		}
-
-		const workoutA = {
-			name: "Workout A",
-			exercises: [
-				{
-					exerciseId: squatId,
-					sets: [
-						{ targetPercentage: 0.6, targetReps: 5, },
-						{ targetPercentage: 0.7, targetReps: 5, },
-						{ targetPercentage: 0.8, targetReps: 5, },
-						{ targetPercentage: 0.9, targetReps: 5, },
-						{ targetPercentage: 1.0, targetReps: 5 }, 
-					],
-				},
-				{
-					exerciseId: benchId,
-					sets: [
-						{ targetPercentage: 0.6, targetReps: 5, },
-						{ targetPercentage: 0.7, targetReps: 5, },
-						{ targetPercentage: 0.8, targetReps: 5, },
-						{ targetPercentage: 0.9, targetReps: 5, },
-						{ targetPercentage: 1.0, targetReps: 5 }, 
-					],
-				},
-				{
-					exerciseId: deadliftId,
-					sets: [
-						{ targetPercentage: 0.6, targetReps: 5, },
-						{ targetPercentage: 0.7, targetReps: 3, },
-						{ targetPercentage: 0.8, targetReps: 2, },
-						{ targetPercentage: 0.9, targetReps: 1, },
-						{ targetPercentage: 1.0, targetReps: 5 }, 
-					],
-				},
-			],
-
-		}
-
-		const workoutB = {
-			name: "Workout B",
-			exercises: [
-				{
-					exerciseId: squatId,
-					sets: [
-						{ targetPercentage: 0.6, targetReps: 5, },
-						{ targetPercentage: 0.7, targetReps: 5, },
-						{ targetPercentage: 0.8, targetReps: 5, },
-						{ targetPercentage: 0.9, targetReps: 5, },
-						{ targetPercentage: 1.0, targetReps: 5 },
-					],
-				},
-				{
-					exerciseId: ohpId,
-					sets: [
-						{ targetPercentage: 0.6, targetReps: 5, },
-						{ targetPercentage: 0.7, targetReps: 5, },
-						{ targetPercentage: 0.8, targetReps: 5, },
-						{ targetPercentage: 0.9, targetReps: 5, },
-						{ targetPercentage: 1.0, targetReps: 5 },
-					],
-				},
-				{
-					exerciseId: deadliftId,
-					sets: [
-						{ targetPercentage: 0.6, targetReps: 5, },
-						{ targetPercentage: 0.7, targetReps: 3, },
-						{ targetPercentage: 0.8, targetReps: 2, },
-						{ targetPercentage: 0.9, targetReps: 1, },
-						{ targetPercentage: 1.0, targetReps: 5 },
-					],
-				},
-			],
-		}
-
-		const defaultProgram = await this.programs.add({name: 'Radically Simple Strength',
-			description: "A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
-			phases: [
-				{ name: "Phase 1", duration: 12, workouts: [workoutA, workoutB] },
-				{ name: "Phase 2", duration: 12, workouts: [workoutA, workoutB] },
-				{ name: "Phase 3", duration: 0, workouts: [workoutA, workoutB] },
-			],
-			currentPhaseIndex: 0,
-			nextWorkoutIndex: 0,
-			workoutCount: 0,
-			phaseWorkoutCount: 0
-		});
-		console.log('Added program', defaultProgram)
-
 		const defaultSettings = await this.settings.add({ id: 1, barWeight: 45, availablePlates: [45, 25, 10, 5, 2.5] })
 		console.log('Added settings', defaultSettings)
 

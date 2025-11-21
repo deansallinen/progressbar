@@ -36,6 +36,7 @@
 		"@sveltejs/adapter-static": "^3.0.9",
 		"@tailwindcss/vite": "^4.1.14",
 		"dexie": "^4.2.0",
+		"runed": "^0.36.0",
 		"svelte-observable": "^0.4.0"
 	}
 }
