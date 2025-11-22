@@ -64,11 +64,13 @@
 													{/if}
 												</div>
 											</td>
-											<td class="align-top"
-												>{set.targetReps === Infinity
-													? "AMRAP"
-													: set.targetReps}</td
-											>
+											<td class="align-top">
+												{#if set.targetReps === Infinity}
+													AMRAP
+												{:else}
+													{set.targetReps} reps
+												{/if}
+											</td>
 											<td class="align-top">
 												<CompleteSetButton
 													{set}

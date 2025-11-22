@@ -30,6 +30,7 @@ export const createNoviceProgram = (getId: (name: string) => number | undefined)
 	const curlsId = getExerciseId("Curls");
 
 	const noviceProgram = {
+		id: 1,
 		name: 'Radically Simple Strength - Novice',
 		description: "A simple, effective program focusing on compound lifts with percentage-based warm-ups.",
 		phases: [
@@ -57,5 +58,5 @@ export const startNoviceProgram = async () => {
 	const noviceProgram = createNoviceProgram((name) => exerciseIds.get(name))
 	const id = await db.programs.add(noviceProgram)
 	await db.settings.update(1, {activeProgramId: id})
-	return { id, ...noviceProgram } as TemplateProgram
+	return { ...noviceProgram, id } as TemplateProgram
 }
