@@ -6,9 +6,14 @@ export function calculateSetWeight(
 	exercise: UserExercise,
 	smallestWeight: number
 ) {
-	if (set.targetWeight) return set.targetWeight;
+	if (set.targetWeight) { 
+		return set.targetWeight 
+	}
 	if (set.targetPercentage) {
 		return calculateSetPercentage(set.targetPercentage, exercise.workingWeight, smallestWeight);
+	}
+	if (exercise.workingWeight) { 
+		return exercise.workingWeight 
 	}
 	return 0
 }

@@ -1,4 +1,6 @@
 import { type ActiveSet, type TemplateSet, type ActiveExercise, type TemplateExercise, db, type UserExercise, } from "$lib/db";
+import { calculateSetPercentage } from "./calculateSetPercentage";
+import { getSmallestWeight } from "./getSmallestWeight";
 
 function setMeetsProgressionCriteria({completedReps}: ActiveSet, {minReps}: TemplateSet): boolean {
 	if (!completedReps) return false;
@@ -29,7 +31,8 @@ function shouldIncrementWeight(activeExercise: ActiveExercise, templateExercise:
 }
 
 async function resetExercise(exercise: UserExercise) {
-	const newWeight = exercise.workingWeight * 0.9
+	const smallestWeight = await getSmallestWeight()
+	const newWeight = calculateSetPercentage(0.9, exercise.workingWeight, smallestWeight)
 	const existingResets = exercise.resets || 0
 	await db.exercises.update(exercise.id!, { workingWeight: newWeight, stalls: 0, resets: existingResets + 1});
 }
