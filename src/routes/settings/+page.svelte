@@ -1,5 +1,7 @@
 <script lang="ts">
   import { exercises } from "$lib/state/exercise.svelte";
+  import { db } from "$lib/db";
+  import { startNoviceProgram } from "$lib/programs/novice";
   import {
     settings,
     handleNameChange,
@@ -9,6 +11,24 @@
     handlePlatesChange,
     handleExerciseNumberChange,
   } from "$lib/state/settings.svelte";
+
+  async function resetPrograms() {
+    if (
+      !confirm(
+        "Are you sure you want to reset all programs? This cannot be undone.",
+      )
+    )
+      return;
+
+    try {
+      await db.programs.clear();
+      await startNoviceProgram();
+      alert("Programs reset successfully.");
+    } catch (e) {
+      console.error(e);
+      alert(`Error resetting programs: ${e}`);
+    }
+  }
 </script>
 
 <main class="container">
@@ -126,6 +146,17 @@
               </article>
             {/each}
           {/if}
+        </section>
+
+        <section>
+          <h2>Danger Zone</h2>
+          <button class="secondary" onclick={resetPrograms}>
+            Reset Program
+          </button>
+          <p>
+            This will delete all existing programs and restore the default
+            Novice program.
+          </p>
         </section>
       </div>
     </div>

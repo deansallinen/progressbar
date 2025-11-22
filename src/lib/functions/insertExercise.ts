@@ -9,7 +9,7 @@ try {
     return primaryKey;
 
   } catch (error ) {
-    if (error.name === 'ConstraintError') {
+    if ((error as { name: string }).name === 'ConstraintError') {
       console.warn("Exercise already exists (ConstraintError). No insertion performed.");
 			const pk = await db.exercises.where('name').equals(e.name).first().then(e => e?.id)
 			if (!pk) throw new Error('something went wrong')
