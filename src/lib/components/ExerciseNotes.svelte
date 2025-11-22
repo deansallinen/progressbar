@@ -36,6 +36,6 @@
 	<button
 		class="secondary outline"
 		style="padding: 0; border:none;"
-		onclick={toggleEditing}>Notes <span>{$noteText}</span></button
+		onclick={toggleEditing}>Notes: <span>{$noteText}</span></button
 	>
 {/if}

@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
-import { createNoviceProgram } from "./programs/novice";
+import { createNoviceProgram, noviceExercises } from "./programs/novice";
 
 export interface TemplateProgram {
 	id: number;
@@ -132,21 +132,32 @@ export class ProgressBarDB extends Dexie {
 		});
 
 		this.version(3).upgrade(async (trans) => {
-			// 1. Prepare ID lookup for the factory
+			// 1. Ensure all novice exercises exist
+			console.log('v3 upgrade')
+			const existingExercises = await trans.table("exercises").toArray();
+			const existingNames = new Set(existingExercises.map(e => e.name));
+
+			for (const exercise of noviceExercises) {
+				if (!existingNames.has(exercise.name)) {
+					await trans.table("exercises").add(exercise);
+				}
+			}
+
+			// 2. Get updated exercises list
 			const exercises = await trans.table("exercises").toArray();
 			const getId = (name: string) => exercises.find(e => e.name === name)?.id;
 
-			// 2. Batch update exercises
+			// 3. Batch update exercises
 			await trans.table("exercises").toCollection().modify(ex => {
 				ex.stalls = ex.stalls ?? 0;
 				ex.resets = ex.resets ?? 0;
 				ex.note = ex.note ?? "";
 			});
 
-			// 3. Generate template WITHOUT global DB access
+			// 4. Generate template WITHOUT global DB access
 			const newNoviceTemplate = createNoviceProgram(getId);
 
-			// 4. Migrate Programs using PUT to replace structure
+			// 5. Migrate Programs using PUT to replace structure
 			const programs = await trans.table("programs").toArray();
 			for (const oldProgram of programs) {
 				if (oldProgram.phases) continue; // Already migrated
