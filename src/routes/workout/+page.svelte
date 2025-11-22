@@ -39,7 +39,7 @@
 					<table>
 						<thead>
 							<tr class="">
-								<!-- <th>Set</th> -->
+								<th>Set</th>
 								<th>Weight</th>
 								<th>Reps</th>
 								<th style="text-align:right;">Completed</th>
@@ -50,7 +50,7 @@
 								{#each exercise.sets as set, setIndex}
 									{#if set}
 										<tr>
-											<!-- <td class="align-top">{setIndex + 1}</td> -->
+											<td class="align-top">{setIndex + 1}</td>
 											<td class="align-top">
 												<div class="">
 													<span class="text-nowrap">
