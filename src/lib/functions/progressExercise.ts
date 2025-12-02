@@ -1,6 +1,5 @@
-import { type ActiveSet, type TemplateSet, type ActiveExercise, type TemplateExercise, db, type UserExercise, } from "$lib/db";
-import { calculateSetPercentage } from "./calculateSetPercentage";
-import { getSmallestWeight } from "./getSmallestWeight";
+import { type ActiveSet, type TemplateSet, type ActiveExercise, type TemplateExercise, db } from "$lib/db";
+import { resetExercise } from "./deloadExercise";
 
 function setMeetsProgressionCriteria({completedReps}: ActiveSet, {minReps}: TemplateSet): boolean {
 	if (!completedReps) return false;
@@ -30,13 +29,6 @@ function shouldIncrementWeight(activeExercise: ActiveExercise, templateExercise:
 	return false;
 }
 
-async function resetExercise(exercise: UserExercise) {
-	const smallestWeight = await getSmallestWeight()
-	const newWeight = calculateSetPercentage(0.9, exercise.workingWeight, smallestWeight)
-	const existingResets = exercise.resets || 0
-	await db.exercises.update(exercise.id!, { workingWeight: newWeight, stalls: 0, resets: existingResets + 1});
-}
-
 export async function progressExercise(activeExercise: ActiveExercise, templateExercise: TemplateExercise) {
 	const userExercise = await db.exercises.get(activeExercise.exerciseId)
 	if (!userExercise) throw new Error('exercise not found')
@@ -56,6 +48,6 @@ export async function progressExercise(activeExercise: ActiveExercise, templateE
 
 	if (userExercise.stalls >= 2) {
 		console.log(`resetting for ${activeExercise.name}`)
-		resetExercise(userExercise)
+		await resetExercise(userExercise.id!)
 	} 
 }

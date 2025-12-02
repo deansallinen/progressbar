@@ -9,4 +9,5 @@ export * from './progressExercise'
 export * from './saveWorkoutToHistory'
 export * from './getSmallestWeight'
 export * from './updateActiveWorkoutSets'
+export * from './deloadExercise'
 

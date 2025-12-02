@@ -11,6 +11,12 @@
     handlePlatesChange,
     handleExerciseNumberChange,
   } from "$lib/state/settings.svelte";
+  import {
+    deloadExercise,
+    deloadAllExercises,
+    resetExercise,
+    resetAllExercises,
+  } from "$lib/functions";
 
   async function resetPrograms() {
     if (
@@ -27,6 +33,70 @@
     } catch (e) {
       console.error(e);
       alert(`Error resetting programs: ${e}`);
+    }
+  }
+
+  async function handleDeloadExercise(exerciseId: number, exerciseName: string) {
+    if (
+      !confirm(
+        `Deload ${exerciseName}? This will reduce the working weight by 10%.`,
+      )
+    )
+      return;
+
+    try {
+      await deloadExercise(exerciseId);
+    } catch (e) {
+      console.error(e);
+      alert(`Error deloading exercise: ${e}`);
+    }
+  }
+
+  async function handleResetExercise(exerciseId: number, exerciseName: string) {
+    if (
+      !confirm(
+        `Reset ${exerciseName}? This will reduce the working weight by 10% and reset the stall counter.`,
+      )
+    )
+      return;
+
+    try {
+      await resetExercise(exerciseId);
+    } catch (e) {
+      console.error(e);
+      alert(`Error resetting exercise: ${e}`);
+    }
+  }
+
+  async function handleDeloadAll() {
+    if (
+      !confirm(
+        "Deload all exercises? This will reduce all working weights by 10%. Useful when returning from injury or sickness.",
+      )
+    )
+      return;
+
+    try {
+      await deloadAllExercises();
+    } catch (e) {
+      console.error(e);
+      alert(`Error deloading exercises: ${e}`);
+    }
+  }
+
+  async function handleResetAll() {
+    if (
+      !confirm(
+        "Reset all exercises? This will reduce all working weights by 10% and reset all stall counters. Use this for long layoffs.",
+      )
+    )
+      return;
+
+    try {
+      await resetAllExercises();
+    } catch (e) {
+      console.error(e);
+      alert(`Error resetting exercises: ${e}`);
     }
   }
 </script>
@@ -143,9 +213,43 @@
                     "incrementWeight",
                   )}
                 />
+
+                <div class="grid">
+                  <button
+                    class="secondary outline"
+                    onclick={() => handleDeloadExercise(exercise.id!, exercise.name)}
+                  >
+                    Deload (-10%)
+                  </button>
+                  <button
+                    class="secondary outline"
+                    onclick={() => handleResetExercise(exercise.id!, exercise.name)}
+                  >
+                    Reset (-10% + clear stalls)
+                  </button>
+                </div>
               </article>
             {/each}
           {/if}
+        </section>
+
+        <section>
+          <h2>Recovery</h2>
+          <p>
+            Use these options when returning from injury, sickness, or a layoff.
+          </p>
+          <div class="grid">
+            <button class="secondary outline" onclick={handleDeloadAll}>
+              Deload All Exercises
+            </button>
+            <button class="secondary outline" onclick={handleResetAll}>
+              Reset All Exercises
+            </button>
+          </div>
+          <small>
+            <strong>Deload:</strong> Reduces all weights by 10% (keeps stall counters).<br />
+            <strong>Reset:</strong> Reduces all weights by 10% and clears stall counters.
+          </small>
         </section>
 
         <section>
