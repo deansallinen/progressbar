@@ -1,9 +1,18 @@
 import { goto } from "$app/navigation";
 import { resolve } from "$app/paths";
 import { db } from "$lib/db";
-import { setNextWorkout } from "./setNextWorkout";
+import { setNextWorkout, type PhaseTransition } from "./setNextWorkout";
 import { progressExercise } from "./progressExercise";
 import { saveWorkoutToHistory } from "./saveWorkoutToHistory";
+
+// Store phase transition info to display on home page
+let pendingPhaseTransition: PhaseTransition | null = null;
+
+export const getPendingPhaseTransition = (): PhaseTransition | null => {
+	const transition = pendingPhaseTransition;
+	pendingPhaseTransition = null; // Clear after reading
+	return transition;
+}
 
 export const completeWorkout = async () => {
 	console.log('completing workout')
@@ -24,7 +33,10 @@ export const completeWorkout = async () => {
 		progressExercise(activeExercise, templateExercise)
 	}
 
-	await setNextWorkout(program, savedWorkout)
+	const phaseTransition = await setNextWorkout(program, savedWorkout)
+	if (phaseTransition?.occurred) {
+		pendingPhaseTransition = phaseTransition;
+	}
 
 	goto(resolve('/'))
 } 

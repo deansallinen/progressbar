@@ -5,15 +5,37 @@
 	import { exercises } from "$lib/state/exercise.svelte";
 	import ExerciseProgress from "$lib/components/ExerciseProgress.svelte";
 	import { checkForLayoff } from "$lib/functions/handleLayoff";
+	import { getPendingPhaseTransition } from "$lib/functions/completeWorkout";
 	import ConsistencyCalendar from "$lib/components/ConsistencyCalendar.svelte";
+	import type { PhaseTransition } from "$lib/functions/setNextWorkout";
 
 	const program = await getActiveProgram();
 	const activeWorkout = await db.activeWorkout.get(1);
 	const workoutHistory = await db.workoutHistory.toArray();
 	const layoffInfo = await checkForLayoff();
+
+	let phaseTransition: PhaseTransition | null = $state(getPendingPhaseTransition());
+
+	function dismissPhaseTransition() {
+		phaseTransition = null;
+	}
 </script>
 
 <main class="container">
+	{#if phaseTransition}
+		<article style="background-color: var(--pico-ins-color); margin-bottom: 1rem;">
+			<header>
+				<strong>Congratulations! You've advanced to a new phase!</strong>
+			</header>
+			<p>
+				You've completed <strong>{phaseTransition.fromPhaseName}</strong> and are now starting <strong>{phaseTransition.toPhaseName}</strong>.
+			</p>
+			<footer>
+				<button onclick={dismissPhaseTransition}>Got it</button>
+			</footer>
+		</article>
+	{/if}
+
 	<section>
 		<div class="flex justify-between items-baseline">
 			<h2>Active Program</h2>
