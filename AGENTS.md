@@ -42,4 +42,25 @@ After completing the code, ask the user if they want a playground link. Only cal
 - **State Management:** Uses Dexie for IndexedDB and Svelte 5 runic state (`.svelte.ts` files).
 - **Error Handling:** Use `try...catch` blocks for asynchronous operations (e.g., database calls) and log errors with `console.error`.
 
+## Data Backup
+
+This app has CSV export/import functionality in `src/lib/functions/backup.ts` for user data backup.
+
+**Important:** When making changes to the database schema or adding/modifying data that should be persisted, always check if the export/import functions need to be updated:
+
+- `exportDataToCSV()` - Gathers and exports user data
+- `importDataFromCSV()` - Parses and restores user data
+- `gatherExportData()` - Collects data from all relevant tables
+- `dataToCSV()` - Formats data into CSV sections
+- `parseCSVData()` - Parses CSV back into data structures
+
+The backup currently handles:
+- Settings (`[SETTINGS]` section)
+- Exercises (`[EXERCISES]` section)
+- Workout history (`[WORKOUT_HISTORY]` section)
+- Set history (`[SET_HISTORY]` section)
+- Program state (`[PROGRAM_STATE]` section)
+
+If you add new tables or fields to existing tables, update the corresponding export/import logic to ensure data can be properly backed up and restored.
+
 

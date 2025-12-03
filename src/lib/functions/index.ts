@@ -12,4 +12,5 @@ export * from './getSmallestWeight'
 export * from './updateActiveWorkoutSets'
 export * from './deloadExercise'
 export * from './handleLayoff'
+export * from './backup'
 

@@ -16,7 +16,46 @@
     deloadAllExercises,
     resetExercise,
     resetAllExercises,
+    exportDataToCSV,
+    importDataFromCSV,
   } from "$lib/functions";
+
+  let fileInput = $state<HTMLInputElement | null>(null);
+  let importStatus = $state<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  async function handleExport() {
+    try {
+      await exportDataToCSV();
+    } catch (e) {
+      console.error(e);
+      alert(`Error exporting data: ${e}`);
+    }
+  }
+
+  async function handleImport() {
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      alert('Please select a file to import.');
+      return;
+    }
+
+    if (!confirm('This will replace your current data with the imported data. Are you sure?')) {
+      return;
+    }
+
+    try {
+      const result = await importDataFromCSV(file);
+      importStatus = { type: result.success ? 'success' : 'error', message: result.message };
+
+      if (result.success && fileInput) {
+        // Clear the file input
+        fileInput.value = '';
+      }
+    } catch (e) {
+      console.error(e);
+      importStatus = { type: 'error', message: `Error importing data: ${e}` };
+    }
+  }
 
   async function resetPrograms() {
     if (
@@ -249,6 +288,40 @@
           <small>
             <strong>Deload:</strong> Reduces all weights by 10% (keeps stall counters).<br />
             <strong>Reset:</strong> Reduces all weights by 10% and clears stall counters.
+          </small>
+        </section>
+
+        <section>
+          <h2>Backup & Restore</h2>
+          <p>Export your data as a CSV file for backup, or import a previously exported file.</p>
+
+          <div class="grid">
+            <button class="secondary outline" onclick={handleExport}>
+              Export Data
+            </button>
+            <div>
+              <input
+                type="file"
+                accept=".csv"
+                bind:this={fileInput}
+                style="display: none;"
+                onchange={handleImport}
+              />
+              <button class="secondary outline" onclick={() => fileInput?.click()}>
+                Import Data
+              </button>
+            </div>
+          </div>
+
+          {#if importStatus}
+            <p class={importStatus.type === 'success' ? 'success' : 'error'}>
+              {importStatus.message}
+            </p>
+          {/if}
+
+          <small>
+            <strong>Export:</strong> Downloads a CSV file with all your exercises, settings, and workout history.<br />
+            <strong>Import:</strong> Restores data from a previously exported CSV file. This will replace your current data.
           </small>
         </section>
 
