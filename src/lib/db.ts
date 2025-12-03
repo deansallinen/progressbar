@@ -27,6 +27,7 @@ export interface TemplateExercise {
 	exerciseId: number; // index
 	sets: TemplateSet[]
 	progressionType: 'linear' | 'rep_based' ;
+	warmup?: boolean;
 }
 
 export interface TemplateSet {
@@ -178,6 +179,48 @@ export class ProgressBarDB extends Dexie {
 		// Add completedAt index to workoutHistory for efficient layoff detection
 		this.version(4).stores({
 			workoutHistory: "++id, programId, completedAt"
+		});
+
+		// Add warmup field to main barbell exercises in novice program
+		this.version(5).upgrade(async (trans) => {
+			const programs = await trans.table("programs").toArray();
+
+			// Main barbell exercises that should have warmup sets
+			const warmupExerciseNames = new Set([
+				"Squat",
+				"Bench Press",
+				"Deadlift",
+				"Overhead Press"
+			]);
+
+			// Get exercise name to ID mapping
+			const exercises = await trans.table("exercises").toArray();
+			const warmupExerciseIds = new Set(
+				exercises
+					.filter(e => warmupExerciseNames.has(e.name))
+					.map(e => e.id)
+			);
+
+			for (const program of programs) {
+				if (!program.phases) continue;
+
+				let updated = false;
+				for (const phase of program.phases) {
+					for (const workout of phase.workouts) {
+						for (const exercise of workout.exercises) {
+							// Add warmup: true if this is a main barbell exercise and warmup isn't already set
+							if (warmupExerciseIds.has(exercise.exerciseId) && exercise.warmup === undefined) {
+								exercise.warmup = true;
+								updated = true;
+							}
+						}
+					}
+				}
+
+				if (updated) {
+					await trans.table("programs").put(program);
+				}
+			}
 		});
 
 		this.on("populate", () => this.populate());

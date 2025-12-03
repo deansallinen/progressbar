@@ -46,18 +46,35 @@ export const createActiveWorkout = async (): Promise<CreateWorkoutResult | undef
 			throw new Error(`Exercise with ID ${templateExercise.exerciseId} not found.`);
 		}
 
-		let activeSets: ActiveSet[] = templateExercise.sets.map((set, index) => { 
+		let activeSets: ActiveSet[] = [];
+
+		// Add warmup set if warmup is enabled for this exercise
+		if (templateExercise.warmup) {
+			const settings = await db.settings.get(1);
+			const barWeight = settings?.barWeight || 45; // Default to 45lbs if not set
+
+			activeSets.push({
+				setIndex: -1, // Special index for warmup set
+				minReps: 0, // No minimum for warmup
+				targetReps: 10, // 10 reps as mentioned in the book
+				targetWeight: barWeight,
+				initialPercentage: 0, // Not a percentage-based set
+			});
+		}
+
+		// Add the regular sets
+		templateExercise.sets.forEach((set, index) => {
 			// if the exercise is in a reset, the working set is AMRAP a.k.a. Infinity
 			const targetReps = userExercise.resets && set.targetPercentage === 1.0 ? Infinity : set.targetReps;
 			const targetWeight = calculateSetWeight(set, userExercise, smallestWeight)
 
-			return {
+			activeSets.push({
 				setIndex: index,
 				minReps: set.minReps,
-				targetReps, 
+				targetReps,
 				targetWeight,
 				initialPercentage: set.targetPercentage || 1
-			} 
+			});
 		});
 
 		activeExercises.push({

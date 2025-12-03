@@ -29,10 +29,12 @@
 		}
 	});
 
-	function dismissLayoffNotice() {
-		showLayoffNotice = false;
-	}
-</script>
+		function dismissLayoffNotice() {
+			showLayoffNotice = false;
+		}
+	</script>
+
+
 
 <main class="container pb-12">
 	{#if showLayoffNotice && layoffInfo}
@@ -79,7 +81,13 @@
 								{#each exercise.sets as set, setIndex}
 									{#if set}
 										<tr>
-											<td class="align-top">{setIndex + 1}</td>
+											<td class="align-top">
+												{#if set.setIndex === -1}
+													Warmup
+												{:else}
+													{setIndex + 1}
+												{/if}
+											</td>
 											<td class="align-top">
 												<div class="">
 													<span class="text-nowrap">

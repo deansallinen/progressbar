@@ -13,11 +13,12 @@ export const updateActiveWorkoutSets = async (exerciseId: number, newWorkingWeig
 	const smallestWeight = await getSmallestWeight()
 
 	for (const set of activeExercise.sets) {
-		// Only recalculate if the set hasn't been completed
-		if (!set.completedAt) {
-			set.targetWeight = calculateSetPercentage(set.initialPercentage, newWorkingWeight, smallestWeight);
-			console.log(set.targetWeight)
+		// Skip warmup sets (they're always bar weight) and completed sets
+		if (set.setIndex === -1 || set.completedAt) {
+			continue;
 		}
+		set.targetWeight = calculateSetPercentage(set.initialPercentage, newWorkingWeight, smallestWeight);
+		console.log(set.targetWeight)
 	}
 
 	await db.activeWorkout.put(workout);
