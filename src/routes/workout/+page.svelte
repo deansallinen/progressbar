@@ -8,7 +8,7 @@
 	import { onMount } from "svelte";
 	import ExerciseProgress from "$lib/components/ExerciseProgress.svelte";
 	import ExerciseNotes from "$lib/components/ExerciseNotes.svelte";
-	import { completeSet, updateCompletedReps, completeWorkout } from "$lib/functions";
+	import { completeSet, updateCompletedReps, completeWorkout, cancelWorkout } from "$lib/functions";
 	import { createActiveWorkout } from "$lib/functions/createActiveWorkout";
 	import { liveQuery } from "dexie";
 	import { db } from "$lib/db";
@@ -45,6 +45,12 @@
 
 	function dismissLayoffNotice() {
 		showLayoffNotice = false;
+	}
+
+	function handleCancelWorkout() {
+		if (confirm('Are you sure you want to cancel this workout?')) {
+			cancelWorkout();
+		}
 	}
 </script>
 
@@ -138,6 +144,9 @@
 				</section>
 			{/if}
 		{/each}
-		<button class="w-full" onclick={completeWorkout}>Complete Workout</button>
+		<div class="grid gap-2">
+			<button class="flex-1 secondary outline" onclick={handleCancelWorkout}>Cancel Workout</button>
+			<button class="flex-1" onclick={completeWorkout}>Complete Workout</button>
+		</div>
 	{/if}
 </main>
