@@ -2,12 +2,13 @@
 	import PlateCalculator from "$lib/components/PlateCalculator.svelte";
 	import TargetWeight from "$lib/components/TargetWeight.svelte";
 	import CompleteSetButton from "$lib/components/CompleteSetButton.svelte";
+	import RepSelector from "$lib/components/RepSelector.svelte";
 	import RestTimer from "$lib/components/RestTimer.svelte";
 	import { settings } from "$lib/state/settings.svelte";
 	import { onMount } from "svelte";
 	import ExerciseProgress from "$lib/components/ExerciseProgress.svelte";
 	import ExerciseNotes from "$lib/components/ExerciseNotes.svelte";
-	import { completeSet, completeWorkout } from "$lib/functions";
+	import { completeSet, updateCompletedReps, completeWorkout } from "$lib/functions";
 	import { createActiveWorkout } from "$lib/functions/createActiveWorkout";
 	import { liveQuery } from "dexie";
 	import { db } from "$lib/db";
@@ -19,6 +20,19 @@
 	let layoffInfo: LayoffInfo | null = $state(null);
 	let showLayoffNotice = $state(false);
 
+	// Track working reps for each set: key is "exerciseIndex-setIndex"
+	let workingReps: Record<string, number> = $state({});
+
+	function getWorkingReps(exerciseIndex: number, setIndex: number, targetReps: number): number {
+		const key = `${exerciseIndex}-${setIndex}`;
+		return workingReps[key] ?? (targetReps === Infinity ? 10 : targetReps);
+	}
+
+	function setWorkingReps(exerciseIndex: number, setIndex: number, reps: number) {
+		const key = `${exerciseIndex}-${setIndex}`;
+		workingReps[key] = reps;
+	}
+
 	onMount(async () => {
 		if (!workout) {
 			const result = await createActiveWorkout();
@@ -29,10 +43,10 @@
 		}
 	});
 
-		function dismissLayoffNotice() {
-			showLayoffNotice = false;
-		}
-	</script>
+	function dismissLayoffNotice() {
+		showLayoffNotice = false;
+	}
+</script>
 
 
 
@@ -70,10 +84,10 @@
 					<table>
 						<thead>
 							<tr class="">
-								<th>Set</th>
+								<th>#</th>
 								<th>Weight</th>
 								<th>Reps</th>
-								<th style="text-align:right;">Completed</th>
+								<th style="text-align:right;">Done</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -82,11 +96,7 @@
 									{#if set}
 										<tr>
 											<td class="align-top">
-												{#if set.setIndex === -1}
-													Warmup
-												{:else}
-													{setIndex + 1}
-												{/if}
+													{setIndex}
 											</td>
 											<td class="align-top">
 												<div class="">
@@ -102,17 +112,18 @@
 												</div>
 											</td>
 											<td class="align-top">
-												{#if set.targetReps === Infinity}
-													AMRAP
-												{:else}
-													{set.targetReps} reps
-												{/if}
+												<RepSelector
+													{set}
+													reps={getWorkingReps(exerciseIndex, setIndex, set.targetReps)}
+													onRepsChange={(reps) => setWorkingReps(exerciseIndex, setIndex, reps)}
+													onUpdateCompletedReps={(reps) => updateCompletedReps(exerciseIndex, setIndex, reps)}
+												/>
 											</td>
 											<td class="align-top">
 												<CompleteSetButton
 													{set}
-													onCompleteSet={(reps) =>
-														completeSet(exerciseIndex, setIndex, reps)}
+													onCompleteSet={() =>
+														completeSet(exerciseIndex, setIndex, getWorkingReps(exerciseIndex, setIndex, set.targetReps))}
 												/>
 											</td>
 										</tr>
