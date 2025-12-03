@@ -182,12 +182,12 @@ export class ProgressBarDB extends Dexie {
 	 * Seeds the database with initial default data. This method is called
 	 * automatically by the 'populate' event handler.
 	 */
-	async populate() {
-		const defaultSettings = await this.settings.add({ id: 1, barWeight: 45, availablePlates: [45, 25, 10, 5, 2.5] })
-		console.log('Added settings', defaultSettings)
+ 	async populate() {
+ 		const defaultSettings = await this.settings.add({ id: 1, barWeight: 45, availablePlates: [45, 25, 10, 5, 2.5], weightUnit: "lbs" })
+ 		console.log('Added settings', defaultSettings)
 
-		console.log("Database seeded successfully.");
-	}
+ 		console.log("Database seeded successfully.");
+ 	}
 }
 
 export const db = new ProgressBarDB();
