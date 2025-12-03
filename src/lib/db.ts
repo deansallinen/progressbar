@@ -175,6 +175,11 @@ export class ProgressBarDB extends Dexie {
 			}
 		});
 
+		// Add completedAt index to workoutHistory for efficient layoff detection
+		this.version(4).stores({
+			workoutHistory: "++id, programId, completedAt"
+		});
+
 		this.on("populate", () => this.populate());
 	}
 

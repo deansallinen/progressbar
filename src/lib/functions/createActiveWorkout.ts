@@ -2,12 +2,18 @@ import { db, type ActiveExercise, type ActiveSet, type ActiveWorkout } from "$li
 import { getActiveProgram } from "$lib/state/program.svelte";
 import { calculateSetWeight } from "./calculateSetWeight";
 import { getSmallestWeight } from "./getSmallestWeight";
+import { handleLayoff, type LayoffInfo } from "./handleLayoff";
 
-export const createActiveWorkout = async () => {
+export interface CreateWorkoutResult {
+	workout: ActiveWorkout | undefined;
+	layoffInfo: LayoffInfo | null;
+}
+
+export const createActiveWorkout = async (): Promise<CreateWorkoutResult | undefined> => {
 	const existingActiveWorkout = await db.activeWorkout.get(1); 
 	if (existingActiveWorkout) {
 		console.log("Existing workout.");
-		return;
+		return { workout: existingActiveWorkout, layoffInfo: null };
 	}
 
 	// No existing workout, check for an active program to start a new one
@@ -17,6 +23,10 @@ export const createActiveWorkout = async () => {
 		console.log("no program")
 		return undefined;
 	}
+
+	// Check for layoff and apply any necessary weight adjustments
+	// This must happen BEFORE we calculate set weights
+	const layoffInfo = await handleLayoff();
 
 	const currentPhase = program.phases[program.currentPhaseIndex];
 	const workoutTemplate = currentPhase.workouts[program.nextWorkoutIndex];
@@ -71,5 +81,5 @@ export const createActiveWorkout = async () => {
 	await db.programs.update(program.id, {workoutCount: program.workoutCount + 1})
 
 	console.log("Started new workout and saved to ActiveWorkout table.");
-	return newActiveWorkout;
+	return { workout: newActiveWorkout, layoffInfo };
 }

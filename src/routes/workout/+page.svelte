@@ -11,16 +11,45 @@
 	import { createActiveWorkout } from "$lib/functions/createActiveWorkout";
 	import { liveQuery } from "dexie";
 	import { db } from "$lib/db";
+	import type { LayoffInfo } from "$lib/functions/handleLayoff";
 
 	const activeWorkoutStore = liveQuery(() => db.activeWorkout.get(1));
 	const workout = $derived($activeWorkoutStore);
 
-	onMount(() => {
-		if (!workout) createActiveWorkout();
+	let layoffInfo: LayoffInfo | null = $state(null);
+	let showLayoffNotice = $state(false);
+
+	onMount(async () => {
+		if (!workout) {
+			const result = await createActiveWorkout();
+			if (result?.layoffInfo && result.layoffInfo.type !== 'none') {
+				layoffInfo = result.layoffInfo;
+				showLayoffNotice = true;
+			}
+		}
 	});
+
+	function dismissLayoffNotice() {
+		showLayoffNotice = false;
+	}
 </script>
 
 <main class="container pb-12">
+	{#if showLayoffNotice && layoffInfo}
+		<article class="mb-4" style="background-color: var(--pico-mark-background-color);">
+			<header>
+				<strong>Layoff Adjustment Applied</strong>
+			</header>
+			<p>
+				It's been <strong>{layoffInfo.daysSinceLastWorkout} days</strong> since your last workout.
+			</p>
+			<p>{layoffInfo.adjustmentMade}</p>
+			<footer>
+				<button onclick={dismissLayoffNotice}>Got it</button>
+			</footer>
+		</article>
+	{/if}
+
 	{#if workout}
 		<h1>{workout.name}</h1>
 		<hr />
