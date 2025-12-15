@@ -35,7 +35,6 @@ export const phase1 = (squatId:number, benchId:number, deadliftId:number, ohpId:
 			{
 				exerciseId: deadliftId,
 				progressionType: 'linear',
-				warmup: true,
 				sets: [
 					{ targetPercentage: 0.6,  minReps: 5, targetReps: 5 },
 					{ targetPercentage: 0.7,  minReps: 3, targetReps: 3 },
@@ -76,7 +75,6 @@ export const phase1 = (squatId:number, benchId:number, deadliftId:number, ohpId:
 				{
 					exerciseId: deadliftId,
 					progressionType: 'linear',
-					warmup: true,
 					sets: [
 						{ targetPercentage: 0.6,  minReps: 5, targetReps: 5 },
 						{ targetPercentage: 0.7,  minReps: 3, targetReps: 3 },

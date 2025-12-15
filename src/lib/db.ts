@@ -223,6 +223,39 @@ export class ProgressBarDB extends Dexie {
 			}
 		});
 
+		// Remove warmup from deadlift exercises
+		this.version(6).upgrade(async (trans) => {
+			const programs = await trans.table("programs").toArray();
+
+			// Get deadlift exercise ID
+			const exercises = await trans.table("exercises").toArray();
+			const deadliftExercise = exercises.find(e => e.name === "Deadlift");
+			if (!deadliftExercise) return; // Deadlift not found, nothing to migrate
+
+			const deadliftId = deadliftExercise.id;
+
+			for (const program of programs) {
+				if (!program.phases) continue;
+
+				let updated = false;
+				for (const phase of program.phases) {
+					for (const workout of phase.workouts) {
+						for (const exercise of workout.exercises) {
+							// Remove warmup property if this is a deadlift exercise
+							if (exercise.exerciseId === deadliftId && exercise.warmup === true) {
+								delete exercise.warmup;
+								updated = true;
+							}
+						}
+					}
+				}
+
+				if (updated) {
+					await trans.table("programs").put(program);
+				}
+			}
+		});
+
 		this.on("populate", () => this.populate());
 	}
 
